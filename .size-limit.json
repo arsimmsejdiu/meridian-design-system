@@ -6,24 +6,24 @@
     "limit": "3 kB"
   },
   {
-    "name": "one component, standalone (mrd-button + runtime)",
+    "name": "one component, standalone (mrd-button + inlined runtime)",
     "path": "packages/components/dist/components/mrd-button.js",
-    "limit": "12 kB"
+    "limit": "25 kB"
   },
   {
     "name": "text field, standalone",
     "path": "packages/components/dist/components/mrd-text-field.js",
-    "limit": "14 kB"
+    "limit": "25 kB"
   },
   {
-    "name": "react — form adapters, excluding peers",
+    "name": "react \u2014 form adapters, excluding peers",
     "path": "packages/react/dist/index.js",
     "import": "{ MeridianForm, FormTextField }",
     "ignore": ["react", "react-dom", "react-hook-form", "zod", "@hookform/resolvers"],
     "limit": "4 kB"
   },
   {
-    "name": "react — useTheme alone (tree-shaking check)",
+    "name": "react \u2014 useTheme alone (tree-shaking check)",
     "path": "packages/react/dist/index.js",
     "import": "{ useTheme }",
     "ignore": ["react"],

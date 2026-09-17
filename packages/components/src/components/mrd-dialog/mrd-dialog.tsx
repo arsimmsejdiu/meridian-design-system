@@ -122,11 +122,27 @@ export class MrdDialog {
     if (typeof dialog.showModal === 'function' && !dialog.open) {
       dialog.showModal();
     } else {
+      // No top layer available. The dialog still opens; it just does not make
+      // the rest of the document inert.
       dialog.setAttribute('open', '');
-      // Only needed off the top layer; showModal() makes the rest inert itself.
-      this.trap = new FocusTrap(dialog);
-      this.trap.activate();
     }
+
+    /*
+     * The trap runs even when `showModal()` succeeded, which looks redundant and
+     * is not.
+     *
+     * A modal dialog in the top layer contains Tab to its own subtree. Our
+     * content does not live there: the `<dialog>` is inside this component's
+     * shadow root and renders `<slot>`s, so everything the consumer passed is a
+     * DOM child of the *host*, not of the dialog. Chromium's containment follows
+     * the DOM tree, so Tab walks straight past the footer buttons and out to
+     * `<body>` — verified in the e2e suite, which is the only place it shows up.
+     *
+     * The trap is cheap (one capturing keydown listener) and, since it consults
+     * the flattened tree, it covers both cases with one path.
+     */
+    this.trap = new FocusTrap(dialog, this.host);
+    this.trap.activate();
 
     lockScroll();
     requestAnimationFrame(() => this.moveInitialFocus(dialog));

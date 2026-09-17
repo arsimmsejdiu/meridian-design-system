@@ -77,6 +77,13 @@ export const config: Config = {
   ],
   testing: {
     browserHeadless: 'new',
+    /*
+     * Chromium refuses to start inside a container without these. CI runners and
+     * most Docker images are exactly that, so without them the e2e suite fails
+     * before it has run a single test — and the failure reads like a broken test
+     * rather than a broken environment.
+     */
+    browserArgs: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
     setupFilesAfterEnv: ['<rootDir>/src/test/setup.ts'],
     /*
      * Coverage is measured over the spec suite only, so `mrd-dialog` is excluded:

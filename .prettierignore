@@ -19,3 +19,4 @@ packages/*/hydrate/
 packages/*/loader/
 apps/*/storybook-static/
 examples/*/dist/
+packages/components/custom-elements.d.ts

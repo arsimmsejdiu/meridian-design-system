@@ -31,17 +31,49 @@ const isVisible = (el: HTMLElement): boolean => {
 };
 
 /**
- * Focusable descendants in tab order, including those inside open shadow roots.
- * A design system built on Web Components cannot use a flat querySelectorAll
- * here: half the focusable elements live one shadow boundary down.
+ * Focusable descendants in tab order, crossing both shadow boundaries **and**
+ * slots.
+ *
+ * A design system built on Web Components cannot use a flat `querySelectorAll`
+ * here, and descending into shadow roots alone is not enough either. Slotted
+ * content is the case that bites: `<mrd-dialog>` renders `<slot name="footer">`
+ * inside its shadow root, but the buttons the consumer passed are children of
+ * the *host*, in the light DOM. A shadow-only walk never reaches them, so the
+ * focus trap sees one focusable element — its own close button — and lets Tab
+ * walk straight out of the dialog past everything the consumer put in it.
+ *
+ * Nodes are visited in composed-tree order, so the result matches the order a
+ * user actually tabs through.
  */
 export function getFocusableElements(root: ParentNode): HTMLElement[] {
   const found: HTMLElement[] = [];
+  const seen = new Set<HTMLElement>();
+
+  const consider = (el: HTMLElement) => {
+    if (seen.has(el)) return;
+    seen.add(el);
+    if (el.matches(FOCUSABLE) && isVisible(el)) found.push(el);
+  };
 
   const walk = (node: ParentNode) => {
-    for (const el of Array.from(node.querySelectorAll<HTMLElement>('*'))) {
-      if (el.matches(FOCUSABLE) && isVisible(el)) found.push(el);
+    for (const el of Array.from(node.children) as HTMLElement[]) {
+      if (el instanceof HTMLSlotElement) {
+        // Follow the slot to whatever the consumer actually passed. Falls back
+        // to the slot's own children, which are the default content.
+        const assigned = el.assignedElements({ flatten: true }) as HTMLElement[];
+        for (const child of assigned.length
+          ? assigned
+          : (Array.from(el.children) as HTMLElement[])) {
+          consider(child);
+          if (child.shadowRoot) walk(child.shadowRoot);
+          walk(child);
+        }
+        continue;
+      }
+
+      consider(el);
       if (el.shadowRoot) walk(el.shadowRoot);
+      walk(el);
     }
   };
 
@@ -58,10 +90,23 @@ export function getFocusableElements(root: ParentNode): HTMLElement[] {
  */
 export class FocusTrap {
   private readonly container: HTMLElement;
+  /** Where slotted content actually lives, when the container is in a shadow root. */
+  private readonly host: HTMLElement | undefined;
   private active = false;
 
-  constructor(container: HTMLElement) {
+  constructor(container: HTMLElement, host?: HTMLElement) {
     this.container = container;
+    this.host = host;
+  }
+
+  /** Focusables in the container, plus anything slotted into it from the host. */
+  private focusable(): HTMLElement[] {
+    const inContainer = getFocusableElements(this.container);
+    if (!this.host) return inContainer;
+
+    const merged = new Set(inContainer);
+    for (const el of getFocusableElements(this.host)) merged.add(el);
+    return Array.from(merged);
   }
 
   activate(): void {
@@ -79,7 +124,7 @@ export class FocusTrap {
   private onKeyDown = (event: KeyboardEvent): void => {
     if (event.key !== 'Tab') return;
 
-    const focusable = getFocusableElements(this.container);
+    const focusable = this.focusable();
     if (focusable.length === 0) {
       // Nothing to focus: keep focus on the container rather than escaping.
       event.preventDefault();
