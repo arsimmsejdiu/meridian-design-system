@@ -1,0 +1,152 @@
+import {
+  FormProvider,
+  useForm,
+  type UseFormProps,
+  type FieldValues,
+  type SubmitHandler,
+  type FieldErrors,
+} from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect, useId, useRef, type ReactNode } from 'react';
+import type { ZodType } from 'zod';
+
+export interface MeridianFormProps<T extends FieldValues> extends Omit<
+  UseFormProps<T>,
+  'resolver'
+> {
+  schema: ZodType<T>;
+  onSubmit: SubmitHandler<T>;
+  children: ReactNode;
+  /** Heading of the error summary. Should describe the problem, not the form. */
+  errorSummaryHeading?: string;
+  /** Set false to render inline errors only — rarely the right call. */
+  errorSummary?: boolean;
+  className?: string;
+}
+
+/** Flatten nested `errors` into `[path, message]`, in field order. */
+function flattenErrors<T extends FieldValues>(
+  errors: FieldErrors<T>,
+  prefix = '',
+): Array<[string, string]> {
+  const out: Array<[string, string]> = [];
+
+  for (const [key, value] of Object.entries(errors)) {
+    if (!value) continue;
+    const path = prefix ? `${prefix}.${key}` : key;
+
+    if (typeof (value as { message?: unknown }).message === 'string') {
+      out.push([path, (value as { message: string }).message]);
+    } else if (typeof value === 'object') {
+      // Nested object or field array — recurse rather than reporting "invalid".
+      out.push(...flattenErrors(value as FieldErrors<T>, path));
+    }
+  }
+
+  return out;
+}
+
+/**
+ * A form wrapper: Zod schema in, validated values out.
+ *
+ * Beyond wiring the resolver, it renders an **error summary** — the pattern
+ * GOV.UK popularised and most design systems skip. On a failed submit the user
+ * gets a single focusable region listing every problem, each entry linking to
+ * its field. That is what makes a long form usable with a screen reader:
+ * without it, the user has to walk the whole form again to find what went wrong.
+ *
+ * Covers WCAG 3.3.1 (error identification) and 3.3.3 (error suggestion).
+ *
+ * Note on focus: the summary is focused once per *failed submit*, keyed on
+ * `submitCount`, not on every render while it is visible. Focusing in a render
+ * callback looks equivalent and is not — it drags focus back to the summary on
+ * every keystroke while the user is trying to fix the first field.
+ */
+export function MeridianForm<T extends FieldValues>({
+  schema,
+  onSubmit,
+  children,
+  errorSummaryHeading = 'There is a problem',
+  errorSummary = true,
+  className,
+  ...formOptions
+}: MeridianFormProps<T>) {
+  const methods = useForm<T>({
+    ...formOptions,
+    resolver: zodResolver(schema),
+    // onTouched, not onChange: validating while someone is still typing their
+    // email tells them it's wrong before they have finished writing it.
+    mode: formOptions.mode ?? 'onTouched',
+    /**
+     * Two things cannot both have focus. React Hook Form's `shouldFocusError`
+     * sends focus to the first invalid field; the summary wants it too, and
+     * because RHF focuses after our effect, the field wins silently — you get
+     * a summary the user is never told about.
+     *
+     * When the summary is rendered it takes focus and RHF's is turned off: the
+     * summary states how many problems there are and lets the user choose one,
+     * which is more use than being dropped into the first of seven. Without a
+     * summary, RHF's behaviour is the right one and is left alone.
+     */
+    shouldFocusError: errorSummary ? false : (formOptions.shouldFocusError ?? true),
+  });
+
+  const summaryId = useId();
+  const summaryRef = useRef<HTMLElement | null>(null);
+  const focusedForSubmit = useRef(0);
+
+  const { errors, submitCount, isSubmitting } = methods.formState;
+  const entries = flattenErrors(errors);
+  const showSummary = errorSummary && submitCount > 0 && entries.length > 0;
+
+  useEffect(() => {
+    if (!showSummary) return;
+    if (focusedForSubmit.current === submitCount) return;
+    focusedForSubmit.current = submitCount;
+    summaryRef.current?.focus();
+  }, [showSummary, submitCount]);
+
+  return (
+    <FormProvider {...methods}>
+      <form
+        noValidate
+        className={className}
+        aria-busy={isSubmitting || undefined}
+        onSubmit={methods.handleSubmit(onSubmit)}
+      >
+        {showSummary && (
+          <mrd-banner
+            id={summaryId}
+            tone="danger"
+            heading={errorSummaryHeading}
+            live
+            // Focusable as a target, but not in the tab order — a user who has
+            // already moved past it should not have to pass through it again.
+            tabIndex={-1}
+            ref={summaryRef}
+          >
+            <ul>
+              {entries.map(([name, message]) => (
+                <li key={name}>
+                  <a
+                    href={`#${name}`}
+                    onClick={event => {
+                      event.preventDefault();
+                      // setFocus goes through our field ref, which calls the
+                      // element's setFocus() method — the real input is inside
+                      // a shadow root and cannot be reached with a DOM query.
+                      methods.setFocus(name as never);
+                    }}
+                  >
+                    {message}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </mrd-banner>
+        )}
+        {children}
+      </form>
+    </FormProvider>
+  );
+}

@@ -1,0 +1,26 @@
+{
+  "name": "@meridian/angular",
+  "version": "0.1.0",
+  "description": "Angular bindings for Meridian — generated from the component source.",
+  "license": "Apache-2.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "lint": "eslint src --ext .ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "peerDependencies": {
+    "@angular/core": ">=17",
+    "@angular/forms": ">=17"
+  },
+  "dependencies": {
+    "@meridian/components": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3"
+  }
+}

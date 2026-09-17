@@ -1,0 +1,81 @@
+{
+  "theme": {
+    "surface": {
+      "canvas": { "value": "{color.palette.neutral.1000}" },
+      "subtle": { "value": "{color.palette.neutral.900}" },
+      "raised": { "value": "{color.palette.neutral.800}" },
+      "sunken": { "value": "{color.palette.neutral.1000}" },
+      "inverse": { "value": "{color.palette.neutral.50}" },
+      "overlay": { "value": "rgba(0, 0, 0, 0.7)" }
+    },
+    "text": {
+      "primary": { "value": "{color.palette.neutral.50}" },
+      "secondary": { "value": "{color.palette.neutral.300}" },
+      "muted": { "value": "{color.palette.neutral.400}", "comment": "4.8:1 on canvas — AA" },
+      "inverse": { "value": "{color.palette.neutral.900}" },
+      "link": { "value": "{color.palette.brand.300}" },
+      "danger": { "value": "{color.palette.danger.100}" },
+      "success": { "value": "{color.palette.success.100}" }
+    },
+    "border": {
+      "subtle": { "value": "{color.palette.neutral.800}" },
+      "default": {
+        "value": "{color.palette.neutral.700}",
+        "comment": "Dividers and decoration only \u2014 exempt from 1.4.11"
+      },
+      "control": {
+        "value": "{color.palette.neutral.400}",
+        "comment": "7.3:1 on canvas, 4.6:1 on raised \u2014 form-control boundary (1.4.11)"
+      },
+      "strong": { "value": "{color.palette.neutral.500}" },
+      "focus": { "value": "{color.palette.brand.300}" },
+      "danger": { "value": "{color.palette.danger.500}" }
+    },
+    "action": {
+      "primary": {
+        "default": { "value": "{color.palette.brand.400}" },
+        "hover": { "value": "{color.palette.brand.300}" },
+        "active": { "value": "{color.palette.brand.200}" },
+        "text": { "value": "{color.palette.neutral.1000}" }
+      },
+      "secondary": {
+        "default": { "value": "transparent" },
+        "hover": { "value": "{color.palette.neutral.800}" },
+        "active": { "value": "{color.palette.neutral.700}" },
+        "text": { "value": "{color.palette.neutral.100}" }
+      },
+      "danger": {
+        "default": { "value": "{color.palette.danger.500}" },
+        "hover": { "value": "{color.palette.danger.700}" },
+        "active": { "value": "{color.palette.danger.700}" },
+        "text": { "value": "{color.palette.neutral.0}" }
+      },
+      "disabled": {
+        "surface": { "value": "{color.palette.neutral.800}" },
+        "text": { "value": "{color.palette.neutral.500}" }
+      }
+    },
+    "status": {
+      "danger": {
+        "surface": { "value": "#3a1414" },
+        "border": { "value": "{color.palette.danger.500}" },
+        "text": { "value": "{color.palette.danger.100}" }
+      },
+      "warning": {
+        "surface": { "value": "#3a2a10" },
+        "border": { "value": "{color.palette.warning.500}" },
+        "text": { "value": "{color.palette.warning.100}" }
+      },
+      "success": {
+        "surface": { "value": "#10301c" },
+        "border": { "value": "{color.palette.success.500}" },
+        "text": { "value": "{color.palette.success.100}" }
+      },
+      "info": {
+        "surface": { "value": "#10273a" },
+        "border": { "value": "{color.palette.info.500}" },
+        "text": { "value": "{color.palette.info.100}" }
+      }
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "motion": {
+    "duration": {
+      "instant": { "value": "0ms" },
+      "fast": { "value": "120ms" },
+      "normal": { "value": "200ms" },
+      "slow": { "value": "320ms" }
+    },
+    "easing": {
+      "standard": { "value": "cubic-bezier(0.2, 0, 0, 1)" },
+      "decelerate": { "value": "cubic-bezier(0, 0, 0, 1)" },
+      "accelerate": { "value": "cubic-bezier(0.3, 0, 1, 1)" }
+    }
+  },
+  "elevation": {
+    "0": { "value": "none" },
+    "1": { "value": "0 1px 2px rgba(13, 16, 20, 0.08), 0 1px 3px rgba(13, 16, 20, 0.06)" },
+    "2": { "value": "0 2px 6px rgba(13, 16, 20, 0.10), 0 4px 12px rgba(13, 16, 20, 0.08)" },
+    "3": { "value": "0 8px 24px rgba(13, 16, 20, 0.14)" }
+  },
+  "zIndex": {
+    "base": { "value": "0" },
+    "sticky": { "value": "100" },
+    "overlay": { "value": "800" },
+    "modal": { "value": "900" },
+    "toast": { "value": "1000" }
+  }
+}

@@ -1,0 +1,35 @@
+/**
+ * Global stylesheet — the only CSS that escapes the shadow boundaries.
+ *
+ * Deliberately minimal: a design system that ships opinionated global styles
+ * breaks the pages it is dropped into.
+ *
+ * Note what is NOT here: the tokens. `@meridian/tokens/dist/tokens.css` is a
+ * separate artefact that the consumer links once. Inlining it would ship the
+ * whole token set a second time to anyone who already has it, and would make
+ * the design system's stylesheet the thing that defines the page's theme —
+ * which is backwards. Tokens belong to the application.
+ *
+ * Every selector is wrapped in `:where()`, so specificity is zero and a
+ * consumer overrides any of it without `!important`.
+ */
+
+:where(html) {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* Respect the user's motion preference globally, including for consumer CSS. */
+@media (prefers-reduced-motion: reduce) {
+  :where(*, *::before, *::after) {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Skip link target support: a programmatically focused region shouldn't ring. */
+:where([tabindex="-1"]:focus:not(:focus-visible)) {
+  outline: none;
+}

@@ -1,0 +1,15 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "ui": "tui",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", "loader/**", "storybook-static/**", "www/**"]
+    },
+    "dev": { "cache": false, "persistent": true },
+    "test": { "dependsOn": ["^build"], "outputs": ["coverage/**"] },
+    "test:a11y": { "dependsOn": ["^build"] },
+    "lint": {},
+    "typecheck": { "dependsOn": ["^build"] }
+  }
+}

@@ -1,0 +1,90 @@
+name: Accessibility issue
+description: Something is not usable with a keyboard, screen reader or other assistive technology.
+title: '[a11y] '
+labels:
+  - a11y
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: >
+        Accessibility issues are bugs, not enhancements, and are triaged above
+        feature work. A conformance failure in a shared component is a failure
+        multiplied by every application that uses it.
+
+
+        You do not need to know which WCAG criterion applies, or to have a fix
+        in mind. "The focus ring disappears behind the sticky header" is a
+        complete and useful report.
+
+  - type: input
+    id: component
+    attributes:
+      label: Component
+      placeholder: mrd-dialog
+    validations:
+      required: true
+
+  - type: dropdown
+    id: at
+    attributes:
+      label: How were you using it?
+      options:
+        - Keyboard only
+        - VoiceOver (macOS)
+        - VoiceOver (iOS)
+        - NVDA
+        - JAWS
+        - TalkBack
+        - Voice Control / Dragon
+        - Zoom or magnification
+        - Forced colours / high contrast
+        - Reduced motion
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened instead?
+      description: If a screen reader announced something, quote it as closely as you can.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: A Storybook story or a link to a reduced case is ideal, but not required.
+      placeholder: |
+        1. Open the Dialog → With form story
+        2. Tab to the email field
+        3. Press Escape
+
+  - type: input
+    id: sc
+    attributes:
+      label: WCAG success criterion, if you know it
+      placeholder: 2.4.11 Focus Not Obscured (Minimum)
+
+  - type: input
+    id: version
+    attributes:
+      label: Package version
+      placeholder: '@meridian/components 0.3.1'
+
+  - type: checkboxes
+    id: severity
+    attributes:
+      label: Impact
+      options:
+        - label: This makes a task impossible to complete with assistive technology
+        - label: There is a workaround, but it is not discoverable

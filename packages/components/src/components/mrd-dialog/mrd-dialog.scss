@@ -1,0 +1,125 @@
+@use "../../styles/mixins" as *;
+
+:host {
+  display: contents;
+}
+
+.dialog {
+  padding: 0;
+  color: var(--mrd-theme-text-primary);
+  background: transparent;
+  border: 0;
+  inline-size: min(100vw - var(--mrd-space-400), 32rem);
+  max-block-size: calc(100vh - var(--mrd-space-600));
+
+  &::backdrop {
+    background: var(--mrd-theme-surface-overlay);
+
+    @include motion-safe {
+      animation: fade var(--mrd-motion-duration-fast) var(--mrd-motion-easing-decelerate);
+    }
+  }
+}
+
+:host([size="sm"]) .dialog {
+  inline-size: min(100vw - var(--mrd-space-400), 24rem);
+}
+:host([size="lg"]) .dialog {
+  inline-size: min(100vw - var(--mrd-space-400), 48rem);
+}
+
+:host([size="full"]) .dialog {
+  inline-size: 100vw;
+  max-inline-size: 100vw;
+  block-size: 100dvh;
+  max-block-size: 100dvh;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  max-block-size: inherit;
+  overflow: hidden;
+  background: var(--mrd-theme-surface-raised);
+  border: 1px solid var(--mrd-theme-border-subtle);
+  border-radius: var(--mrd-radius-lg);
+  box-shadow: var(--mrd-elevation-3);
+
+  @include motion-safe {
+    animation: rise var(--mrd-motion-duration-normal) var(--mrd-motion-easing-decelerate);
+  }
+}
+
+.header {
+  display: flex;
+  gap: var(--mrd-space-200);
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: var(--mrd-space-300) var(--mrd-space-300) var(--mrd-space-200);
+}
+
+.heading {
+  margin: 0;
+  font-size: var(--mrd-font-size-xl);
+  font-weight: var(--mrd-font-weight-semibold);
+  line-height: var(--mrd-font-line-height-snug);
+
+  // Focus lands here on open; the ring would be noise, but we keep it for
+  // keyboard users who Tab back to it.
+  &:focus {
+    outline: none;
+  }
+  @include focus-ring;
+}
+
+.close {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: var(--mrd-theme-text-secondary);
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: var(--mrd-radius-sm);
+  block-size: var(--mrd-space-400);
+  inline-size: var(--mrd-space-400);
+
+  &:hover {
+    background: var(--mrd-theme-action-secondary-hover);
+  }
+
+  @include focus-ring;
+  @include min-target;
+}
+
+.body {
+  padding: 0 var(--mrd-space-300) var(--mrd-space-300);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  font-size: var(--mrd-font-size-md);
+  line-height: var(--mrd-font-line-height-normal);
+  color: var(--mrd-theme-text-secondary);
+}
+
+.footer {
+  display: flex;
+  gap: var(--mrd-space-100);
+  justify-content: flex-end;
+  padding: var(--mrd-space-200) var(--mrd-space-300) var(--mrd-space-300);
+  border-block-start: 1px solid var(--mrd-theme-border-subtle);
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(var(--mrd-space-100)) scale(0.99);
+  }
+}

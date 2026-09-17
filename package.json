@@ -1,0 +1,44 @@
+{
+  "name": "meridian-design-system",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Meridian \u2014 an accessible, framework-agnostic design system built on Web Components.",
+  "license": "Apache-2.0",
+  "packageManager": "pnpm@9.12.0",
+  "engines": {
+    "node": ">=20.11.0",
+    "pnpm": ">=9"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev --parallel",
+    "test": "turbo run test",
+    "test:a11y": "turbo run test:a11y",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "format": "prettier --write \"**/*.{ts,tsx,js,json,scss,md,yml}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,json,scss,md,yml}\"",
+    "storybook": "pnpm --filter @meridian/docs dev",
+    "size": "size-limit",
+    "changeset": "changeset",
+    "version-packages": "changeset version && pnpm install --lockfile-only",
+    "release": "turbo run build --filter=./packages/* && changeset publish",
+    "stylelint": "stylelint \"packages/**/*.scss\"",
+    "audit:contrast": "node packages/tokens/build/audit-contrast.mjs",
+    "example": "pnpm --filter @meridian/example-react-checkout dev"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.27.9",
+    "@size-limit/preset-small-lib": "^11.1.6",
+    "concurrently": "^9.0.1",
+    "eslint": "^9.13.0",
+    "http-server": "^14.1.1",
+    "prettier": "^3.3.3",
+    "size-limit": "^11.1.6",
+    "stylelint": "^16.10.0",
+    "stylelint-config-standard-scss": "^13.1.0",
+    "turbo": "^2.2.3",
+    "typescript": "^5.6.3",
+    "wait-on": "^8.0.1"
+  }
+}

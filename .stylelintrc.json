@@ -1,0 +1,12 @@
+{
+  "extends": ["stylelint-config-standard-scss"],
+  "rules": {
+    "custom-property-pattern": "^mrd-[a-z0-9-]+$",
+    "selector-class-pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+    "scss/dollar-variable-pattern": "^[a-z][a-zA-Z0-9-]*$",
+    "declaration-property-value-disallowed-list": {
+      "/^color$|^background-color$|^border-color$/": ["/^#/", "/^rgb/", "/^hsl/"]
+    },
+    "comment-no-empty": true
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "name": "@meridian/tokens",
+  "version": "0.1.0",
+  "description": "Design tokens — single source of truth for colour, type, space, motion and elevation.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./css": "./dist/tokens.css",
+    "./scss": "./dist/_tokens.scss",
+    "./json": "./dist/tokens.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "node build/build.mjs && tsc -p tsconfig.json",
+    "dev": "node build/build.mjs --watch",
+    "lint": "eslint .",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "style-dictionary": "^4.1.4",
+    "typescript": "^5.6.3"
+  }
+}

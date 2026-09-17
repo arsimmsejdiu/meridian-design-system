@@ -1,0 +1,150 @@
+import { Meta } from '@storybook/blocks';
+
+<Meta title="Meridian/Accessibility" />
+
+# Accessibility
+
+Meridian targets **WCAG 2.2 level AA**. The interesting question is not what we
+target but what is _enforced_ — so this page is organised around what fails a
+build, what is checked by a human, and what we knowingly do not cover.
+
+---
+
+## Enforced in CI
+
+### 1. Contrast, on every build
+
+`packages/tokens/build/audit-contrast.mjs` computes the relative-luminance
+contrast ratio for every foreground/background pair the system actually ships,
+in both themes, and exits non-zero on a failure. It runs as a blocking job.
+
+This catches the most common regression in any design system: someone nudges a
+grey two steps to "soften" a surface, and muted text on that surface quietly
+drops from 4.6:1 to 4.2:1 everywhere at once.
+
+It earned its place on the first run, failing `border.default` against the
+canvas at **1.78:1** — the border of every text input in the system, against a
+requirement of 3:1. The full write-up is on the
+[design tokens](/?path=/docs/meridian-design-tokens--overview) page; the short
+version is that the audit found something a design review had not, which is the
+entire argument for having it.
+
+### 2. axe, on every story
+
+The Storybook test runner loads each story in a real browser and runs
+`axe-playwright` against the WCAG 2.0, 2.1 and 2.2 A/AA rule sets. A new story
+is therefore a new test, which is a deliberate incentive: documenting a
+component variant and testing it are the same action.
+
+Shadow DOM is included — axe traverses shadow roots, which is one of the
+reasons the components are tested through Storybook rather than through jsdom.
+
+### 3. Keyboard behaviour, asserted
+
+Focus order, focus return after a dialog closes, Escape handling, focus
+trapping, and "does this control still work from the keyboard when it is
+loading" are assertions in the Stencil e2e suite and in story `play` functions —
+not notes in a review checklist.
+
+### 4. Bundle size
+
+`size-limit` is not an accessibility gate, but it is an accessibility
+_outcome_: the people most affected by a heavy bundle are on the oldest devices
+and the worst connections.
+
+---
+
+## Checked by a human
+
+Automated tooling catches somewhere around **40%** of real accessibility
+issues. That figure is often quoted as a criticism; the useful reading is that
+it is the 40% that regresses silently. The rest needs a person.
+
+Before a new interactive pattern is released, it is tested with:
+
+- **VoiceOver + Safari** (macOS) and **VoiceOver + Safari** (iOS)
+- **NVDA + Firefox** (Windows)
+- keyboard only, no pointer
+- 400% browser zoom at a 1280px viewport (SC 1.4.10)
+- **forced-colours mode** (Windows high contrast)
+
+The questions asked are the ones a tool cannot ask: is the announcement
+_understandable_, is the reading order the order a user would expect, and is
+the fastest path through this flow still short without a mouse.
+
+---
+
+## Decisions worth knowing about
+
+### Loading buttons stay focusable
+
+A button in a loading state sets `aria-busy` and ignores activation. It does
+**not** become `disabled`. Disabling the element a user has just activated
+removes it from the tab order under their fingers, and the browser gives no
+indication of why focus has vanished. `aria-busy` says "working" without
+removing the control.
+
+### Errors interrupt; confirmations do not
+
+Field and form errors use `role="alert"` (assertive). Success messages use
+`role="status"` (polite). Interruption is a budget: spend it on things the user
+must act on, and a screen-reader user stops trusting the system the moment it is
+overspent.
+
+### Error summaries, not just inline errors
+
+`MeridianForm` renders a focusable summary after a failed submit, listing every
+problem, each linking to its field. Inline errors alone are not enough: a user
+who submits a long form and hears nothing has no way to find what is wrong other
+than walking the whole form again. This is the GOV.UK pattern, and it is the
+single highest-value thing in the React package.
+
+### `hide-label`, never no label
+
+Every form control has a real `<label for>`. `hide-label` removes it visually
+and keeps it in the accessibility tree. Placeholders are not labels — they
+disappear on the first keystroke and most browsers render them below 3:1.
+
+### 44px targets even where the control looks smaller
+
+A small button is visually 32px tall and has a 44px pointer target via an
+expanded hit area (SC 2.5.8). The target is the promise; the visual size is a
+style.
+
+### Focus is visible everywhere, including forced colours
+
+A 3px ring with a 2px offset, using `:focus-visible` so pointer users do not see
+it and keyboard users always do. In forced-colours mode the ring switches to
+`Highlight`, because our token colours are dropped there.
+
+### Motion respects the user's setting
+
+Every transition is gated on `prefers-reduced-motion`. Reduced motion collapses
+durations to `1ms` rather than `0ms`, so `transitionend` still fires and nothing
+that waits on it hangs.
+
+---
+
+## What we do not cover
+
+Stating this is part of the contract; a design system that implies it makes an
+application accessible is doing harm.
+
+- **Page structure.** Landmarks, heading hierarchy and skip links belong to the
+  application. Components cannot know where they sit.
+- **Content.** Link text, alt text, error wording, reading level. `mrd-button`
+  cannot stop you naming four buttons "Click here".
+- **Composition.** Individually conformant components can be assembled into an
+  inaccessible flow — a modal opened from a modal, a table of icon-only buttons
+  with identical names.
+- **Language.** `lang` on the document, and `lang` on any run of text in another
+  language, is the application's job. In Switzerland that one is not
+  hypothetical.
+
+## Reporting a problem
+
+Accessibility issues use their own template
+([`.github/ISSUE_TEMPLATE/accessibility.yml`](https://github.com/arsimmsejdiu/meridian-design-system/blob/main/.github/ISSUE_TEMPLATE/accessibility.yml))
+and are triaged ahead of feature work. A conformance failure in a shared
+component is a failure multiplied by every application that uses it, which is
+the entire argument for having a shared component in the first place.

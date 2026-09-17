@@ -1,0 +1,130 @@
+@use "../../styles/mixins" as *;
+
+:host {
+  display: block;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mrd-space-50);
+  font-family: var(--mrd-font-family-sans);
+}
+
+.label {
+  font-size: var(--mrd-font-size-sm);
+  font-weight: var(--mrd-font-weight-medium);
+  color: var(--mrd-theme-text-primary);
+}
+
+.required {
+  margin-inline-start: var(--mrd-space-25);
+  color: var(--mrd-theme-text-danger);
+}
+
+.control {
+  display: flex;
+  align-items: center;
+  background: var(--mrd-theme-surface-canvas);
+  border: 1px solid var(--mrd-theme-border-control);
+  border-radius: var(--mrd-radius-md);
+
+  @include control-size("md");
+
+  @include motion-safe {
+    transition: border-color var(--mrd-motion-duration-fast) var(--mrd-motion-easing-standard);
+  }
+
+  &:hover {
+    border-color: var(--mrd-theme-border-strong);
+  }
+
+  // The ring is drawn on the wrapper so it surrounds the affixes too.
+  &:has(.input:focus-visible) {
+    outline: var(--mrd-size-focus-ring) solid var(--mrd-theme-border-focus);
+    outline-offset: var(--mrd-size-focus-offset);
+  }
+}
+
+:host([size="sm"]) .control {
+  @include control-size("sm");
+}
+:host([size="lg"]) .control {
+  @include control-size("lg");
+}
+
+.field--invalid .control {
+  border-color: var(--mrd-theme-border-danger);
+  border-width: 2px;
+}
+
+.input {
+  flex: 1;
+  min-inline-size: 0;
+  padding: 0;
+  font: inherit;
+  color: var(--mrd-theme-text-primary);
+  background: transparent;
+  border: 0;
+
+  &::placeholder {
+    color: var(--mrd-theme-text-muted);
+  }
+  &:focus {
+    outline: none;
+  }
+
+  &:disabled {
+    color: var(--mrd-theme-action-disabled-text);
+    cursor: not-allowed;
+    -webkit-text-fill-color: currentcolor; // Safari dims disabled text below 4.5:1
+  }
+}
+
+:host([disabled]) .control {
+  background: var(--mrd-theme-surface-sunken);
+  border-color: var(--mrd-theme-border-subtle);
+}
+
+.affix {
+  display: inline-flex;
+  align-items: center;
+  color: var(--mrd-theme-text-muted);
+
+  &:not(:has(*)) {
+    display: none;
+  }
+  &--start {
+    margin-inline-end: var(--mrd-space-100);
+  }
+  &--end {
+    margin-inline-start: var(--mrd-space-100);
+  }
+}
+
+.hint,
+.error {
+  margin: 0;
+  font-size: var(--mrd-font-size-sm);
+  line-height: var(--mrd-font-line-height-snug);
+}
+
+.hint {
+  color: var(--mrd-theme-text-muted);
+}
+
+.error {
+  display: flex;
+  gap: var(--mrd-space-50);
+  align-items: flex-start;
+  color: var(--mrd-theme-text-danger);
+
+  svg {
+    flex-shrink: 0;
+    margin-block-start: 0.15em;
+  }
+}
+
+.visually-hidden {
+  @include visually-hidden;
+}

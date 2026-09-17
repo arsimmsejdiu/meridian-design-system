@@ -1,0 +1,40 @@
+{
+  "name": "@meridian/docs",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Storybook \u2014 the design system's documentation and visual test surface.",
+  "scripts": {
+    "dev": "storybook dev -p 6006 --no-open",
+    "build": "storybook build -o storybook-static",
+    "test:a11y": "test-storybook --maxWorkers=2",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@hookform/resolvers": "^3.9.1",
+    "@meridian/components": "workspace:*",
+    "@meridian/react": "workspace:*",
+    "@meridian/tokens": "workspace:*",
+    "@storybook/addon-a11y": "^8.4.2",
+    "@storybook/addon-docs": "^8.4.2",
+    "@storybook/addon-essentials": "^8.4.2",
+    "@storybook/addon-interactions": "^8.4.2",
+    "@storybook/addon-themes": "^8.4.2",
+    "@storybook/blocks": "^8.4.2",
+    "@storybook/test": "^8.4.2",
+    "@storybook/test-runner": "^0.19.1",
+    "@storybook/web-components-vite": "^8.4.2",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.3",
+    "axe-playwright": "^2.0.3",
+    "lit": "^3.2.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-hook-form": "^7.53.2",
+    "storybook": "^8.4.2",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.10",
+    "zod": "^3.23.8"
+  }
+}

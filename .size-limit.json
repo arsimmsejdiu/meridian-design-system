@@ -1,0 +1,32 @@
+[
+  {
+    "name": "components — full bundle, gzipped",
+    "path": "packages/components/dist/meridian/*.esm.js",
+    "limit": "22 kB"
+  },
+  {
+    "name": "components — one lazy-loaded component",
+    "path": "packages/components/dist/meridian/mrd-button.entry.js",
+    "limit": "3 kB"
+  },
+  {
+    "name": "tokens CSS",
+    "path": "packages/tokens/dist/tokens.css",
+    "gzip": true,
+    "limit": "3 kB"
+  },
+  {
+    "name": "react — form adapters, excluding peers",
+    "path": "packages/react/dist/index.js",
+    "import": "{ MeridianForm, FormTextField }",
+    "ignore": ["react", "react-dom", "react-hook-form", "zod", "@hookform/resolvers"],
+    "limit": "4 kB"
+  },
+  {
+    "name": "react — useTheme alone",
+    "path": "packages/react/dist/index.js",
+    "import": "{ useTheme }",
+    "ignore": ["react"],
+    "limit": "1 kB"
+  }
+]

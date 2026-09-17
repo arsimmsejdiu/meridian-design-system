@@ -1,0 +1,99 @@
+@use "sass:map";
+
+/// Shared Sass foundation for every component.
+/// Components reference semantic tokens (--mrd-theme-*) only. The palette is
+/// deliberately unreachable from here so a component can never hard-code a brand
+/// colour and break theming. Enforced by .stylelintrc.json.
+
+/// Visible focus indicator meeting WCAG 2.2 SC 2.4.11 (focus not obscured) and
+/// 2.4.13 (focus appearance). Uses :focus-visible so pointer users don't see it.
+@mixin focus-ring($offset: var(--mrd-size-focus-offset)) {
+  &:focus-visible {
+    outline: var(--mrd-size-focus-ring) solid var(--mrd-theme-border-focus);
+    outline-offset: $offset;
+    // Guarantees a visible ring even against a same-colour backdrop.
+    box-shadow: 0 0 0 calc(var(--mrd-size-focus-ring) + 1px) var(--mrd-theme-surface-canvas);
+  }
+
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+}
+
+/// Hide visually, keep for assistive technology. Not `display: none`.
+@mixin visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/// Honour the user's reduced-motion preference. Wrap every transition.
+@mixin motion-safe {
+  @media (prefers-reduced-motion: no-preference) {
+    @content;
+  }
+}
+
+/// WCAG 2.2 SC 2.5.8 — minimum 24x24 pointer target, we use 44px.
+/// Expands the hit area without changing the visual size.
+@mixin min-target($size: var(--mrd-size-target-min)) {
+  position: relative;
+
+  &::after {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: max(100%, #{$size});
+    height: max(100%, #{$size});
+    content: "";
+    transform: translate(-50%, -50%);
+  }
+}
+
+/// Forced-colours (Windows High Contrast). System colours must win; our
+/// backgrounds are dropped, so borders carry the meaning.
+@mixin forced-colors-outline {
+  @media (forced-colors: active) {
+    border: 1px solid ButtonBorder;
+    forced-color-adjust: none;
+    @content;
+  }
+}
+
+@mixin truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+$control-sizes: (
+  "sm": (
+    "height": var(--mrd-size-control-sm),
+    "padding-inline": var(--mrd-space-150),
+    "font-size": var(--mrd-font-size-sm),
+  ),
+  "md": (
+    "height": var(--mrd-size-control-md),
+    "padding-inline": var(--mrd-space-200),
+    "font-size": var(--mrd-font-size-md),
+  ),
+  "lg": (
+    "height": var(--mrd-size-control-lg),
+    "padding-inline": var(--mrd-space-300),
+    "font-size": var(--mrd-font-size-lg),
+  ),
+);
+
+@mixin control-size($size) {
+  $s: map.get($control-sizes, $size);
+
+  block-size: map.get($s, "height");
+  padding-inline: map.get($s, "padding-inline");
+  font-size: map.get($s, "font-size");
+}

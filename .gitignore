@@ -1,0 +1,22 @@
+node_modules/
+dist/
+loader/
+www/
+storybook-static/
+coverage/
+.turbo/
+*.log
+.DS_Store
+.env
+.stencil/
+playwright-report/
+test-results/
+dist-src/
+custom-elements.json
+packages/react/src/generated/
+packages/angular/src/generated/
+
+# Editor / tooling noise
+.qodo/
+.idea/
+.vscode/

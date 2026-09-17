@@ -1,0 +1,91 @@
+@use "../../styles/mixins" as *;
+
+:host {
+  display: block;
+}
+
+.banner {
+  display: flex;
+  gap: var(--mrd-space-150);
+  align-items: flex-start;
+  padding: var(--mrd-space-150) var(--mrd-space-200);
+  font-family: var(--mrd-font-family-sans);
+  font-size: var(--mrd-font-size-sm);
+  line-height: var(--mrd-font-line-height-normal);
+  border: 1px solid;
+  border-radius: var(--mrd-radius-md);
+  // Border-inline-start carries the tone for forced-colours users too.
+  border-inline-start-width: var(--mrd-space-50);
+}
+
+:host([tone="info"]) .banner {
+  color: var(--mrd-theme-status-info-text);
+  background: var(--mrd-theme-status-info-surface);
+  border-color: var(--mrd-theme-status-info-border);
+}
+
+:host([tone="success"]) .banner {
+  color: var(--mrd-theme-status-success-text);
+  background: var(--mrd-theme-status-success-surface);
+  border-color: var(--mrd-theme-status-success-border);
+}
+
+:host([tone="warning"]) .banner {
+  color: var(--mrd-theme-status-warning-text);
+  background: var(--mrd-theme-status-warning-surface);
+  border-color: var(--mrd-theme-status-warning-border);
+}
+
+:host([tone="danger"]) .banner {
+  color: var(--mrd-theme-status-danger-text);
+  background: var(--mrd-theme-status-danger-surface);
+  border-color: var(--mrd-theme-status-danger-border);
+}
+
+.icon {
+  flex-shrink: 0;
+  margin-block-start: 0.1em;
+}
+.content {
+  flex: 1;
+  min-inline-size: 0;
+}
+
+.heading {
+  margin: 0 0 var(--mrd-space-25);
+  font-weight: var(--mrd-font-weight-semibold);
+}
+
+.message {
+  margin: 0;
+}
+
+.actions {
+  display: flex;
+  gap: var(--mrd-space-100);
+
+  &:not(:has(*)) {
+    display: none;
+  }
+  &:has(*) {
+    margin-block-start: var(--mrd-space-150);
+  }
+}
+
+.dismiss {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: inherit;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: var(--mrd-radius-sm);
+  block-size: var(--mrd-space-300);
+  inline-size: var(--mrd-space-300);
+
+  @include focus-ring;
+  @include min-target;
+}

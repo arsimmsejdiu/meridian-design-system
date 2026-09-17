@@ -1,0 +1,71 @@
+import { Meta } from '@storybook/blocks';
+
+<Meta title="Meridian/Introduction" />
+
+# Meridian
+
+A design system that implements each component **once**, as a custom element,
+and generates the React and Angular bindings from it.
+
+---
+
+## The problem this shape solves
+
+An organisation of any size is rarely on one framework, and never on one
+framework for long. The usual response is a component library per framework —
+which means the same button is built three times, drifts three ways, and is
+audited for accessibility three times, or, more often, once.
+
+Meridian authors components as Web Components in [Stencil](https://stenciljs.com).
+The contract is the DOM: a custom element, its attributes, its slots, its
+events. Framework support is then a build step rather than a parallel codebase.
+
+```
+packages/tokens       JSON  →  CSS custom properties, Sass, TypeScript, JSON
+packages/components   Stencil / TSX / Sass / Shadow DOM
+        │
+        ├── packages/react     generated proxies + React Hook Form adapters
+        └── packages/angular   generated directives
+```
+
+Three consequences worth stating, because they are the point:
+
+1. **One accessibility audit.** The keyboard behaviour of `mrd-dialog` is
+   tested once, in a real browser. Every framework inherits the result.
+2. **One visual regression surface.** Chromatic runs against the Storybook
+   stories, which render the elements directly.
+3. **Framework migrations stop being rewrites.** The next framework needs a
+   new output target, not a new library.
+
+The trade-offs — and they are real — are written down in
+[the ADRs](https://github.com/arsimmsejdiu/meridian-design-system/tree/main/docs/adr).
+Shadow DOM makes styling deliberately hard; SSR needs a hydrate build; the
+React 18 story needs typed wrappers. Each has its own record.
+
+## What "done" means here
+
+A component is not finished when it renders. It is finished when:
+
+- it has unit tests and at least one **interaction test** that runs in CI
+- every story passes **axe** at WCAG 2.2 AA
+- keyboard behaviour is asserted, not assumed
+- it works in both themes, and in **forced-colours** mode
+- any new colour pair is added to the **contrast audit**, which blocks the build
+- it has a changeset written by whoever changed it
+
+That list is enforced by CI, not by a checklist in a wiki that nobody opens.
+
+## Where to start
+
+| I want to…                                | Go to                                     |
+| ----------------------------------------- | ----------------------------------------- |
+| See the components                        | **Components** in the sidebar             |
+| Understand the token layers               | **Meridian → Design tokens**              |
+| Know what we guarantee, and what we don't | **Meridian → Accessibility**              |
+| Use this in a React app                   | **Patterns → Forms with React Hook Form** |
+
+## A note on the name
+
+A meridian is a line of longitude — a shared reference that everything else is
+measured against. Systems named after their owning team age badly the moment
+the team is reorganised.

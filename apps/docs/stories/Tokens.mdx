@@ -1,0 +1,235 @@
+import { Meta, ColorPalette, ColorItem } from '@storybook/blocks';
+
+<Meta title="Meridian/Design tokens" />
+
+# Design tokens
+
+One JSON source of truth, compiled by [Style Dictionary](https://styledictionary.com)
+into four artefacts:
+
+| Output         | Consumed by                                 |
+| -------------- | ------------------------------------------- |
+| `tokens.css`   | every component, as CSS custom properties   |
+| `_tokens.scss` | authoring-time Sass, for `@media` and maths |
+| `tokens.ts`    | TypeScript, typed and autocompleting        |
+| `tokens.json`  | Figma and other design tools                |
+
+Nothing is hand-written twice. Change `src/core/color.json`, run `pnpm build`,
+and the value moves everywhere at once.
+
+---
+
+## Three layers, and why
+
+```
+core        →  semantic     →  component
+brand.600      action.primary   button.primary.bg
+#1F4AAE        .default
+```
+
+**Core** is the raw material: the palette, the type scale, the spacing ramp.
+Core tokens carry no meaning. `brand-600` is a blue, not a button.
+
+**Semantic** assigns roles. `theme.action.primary.default` means "the fill of
+the main action", and _that_ is what a component may reference. There is one
+semantic file per theme, and adding a theme means adding one file — no
+component changes, because no component names a colour.
+
+**Component** tokens exist only where a component needs a value that is
+genuinely its own and worth overriding from outside: `--mrd-button-radius`, for
+example.
+
+### The rule that makes it hold
+
+> A component stylesheet may reference semantic tokens only.
+
+This is enforced by Stylelint — `color-no-hex` plus a custom
+`declaration-property-value-disallowed-list` — so a literal `#1F4AAE` in a
+component fails the build rather than surviving review. Conventions that are
+only written down decay; this one cannot.
+
+## Colour
+
+<ColorPalette>
+  <ColorItem
+    title="Brand"
+    subtitle="Primary actions, links, focus"
+    colors={{
+      50: '#eef4ff',
+      100: '#d9e6ff',
+      200: '#b3ccff',
+      300: '#7fa8ff',
+      400: '#4d83f5',
+      500: '#2f62d8',
+      600: '#1f4aae',
+      700: '#173a87',
+      800: '#122c66',
+      900: '#0d1f47',
+    }}
+  />
+  <ColorItem
+    title="Neutral"
+    subtitle="Surfaces, text, borders"
+    colors={{
+      0: '#ffffff',
+      50: '#f7f8f9',
+      100: '#eceef0',
+      200: '#d9dde1',
+      300: '#bcc3ca',
+      400: '#97a1ab',
+      500: '#6f7b87',
+      600: '#55606b',
+      700: '#3f4852',
+      800: '#2b323a',
+      900: '#1a1f25',
+      1000: '#0d1014',
+    }}
+  />
+  <ColorItem
+    title="Danger"
+    subtitle="Destructive actions, errors"
+    colors={{ 100: '#fde8e8', 500: '#c62828', 700: '#8e1c1c' }}
+  />
+  <ColorItem
+    title="Success"
+    subtitle="Confirmations"
+    colors={{ 100: '#e6f4ea', 500: '#1e7a3c', 700: '#14562a' }}
+  />
+  <ColorItem
+    title="Warning"
+    subtitle="Attention, not failure"
+    colors={{ 100: '#fff4e0', 500: '#b26a00', 700: '#7a4800' }}
+  />
+  <ColorItem
+    title="Info"
+    subtitle="Neutral system messages"
+    colors={{ 100: '#e7f1fb', 500: '#1665b8', 700: '#0f4780' }}
+  />
+</ColorPalette>
+
+### Contrast is a build step
+
+`packages/tokens/build/audit-contrast.mjs` computes the WCAG relative
+luminance ratio for every pair we actually ship — body text on each surface,
+button text on each fill, status text on each status surface — in **both**
+themes, and exits non-zero on a failure. It runs as a blocking CI job.
+
+```
+$ node packages/tokens/build/audit-contrast.mjs
+
+  ✔ light Body text on canvas          16.58:1  (min 4.5)  AAA
+  ✔ light Muted text on canvas          6.42:1  (min 4.5)  AA
+  ✔ light Primary button label          7.93:1  (min 4.5)  AAA
+  ✔ light Control border on canvas      4.32:1  (min 3)    AA-large
+  ✔ dark  Primary button label          5.34:1  (min 4.5)  AA
+  …
+  All contrast requirements met.
+```
+
+Designers can change a palette value freely. If it breaks contrast somewhere
+they did not think to check, they find out in the pull request instead of in an
+accessibility audit eighteen months later.
+
+### It found something on its first run
+
+The first time this ran it failed on `theme.border.default` against
+`surface.canvas` — **1.78:1** in the light theme, where SC 1.4.11 asks for 3:1.
+The token was a pleasant light grey, it looked right in every mockup, and it was
+the border of every text input in the system.
+
+The fix was not to lighten the requirement. It was to notice that one token was
+doing two jobs:
+
+| Token                  | Job                          | Requirement                        |
+| ---------------------- | ---------------------------- | ---------------------------------- |
+| `theme.border.subtle`  | Dividers, decoration         | none — not a UI component boundary |
+| `theme.border.default` | Grouping, cards              | none                               |
+| `theme.border.control` | The visible edge of an input | **3:1**, audited                   |
+
+A divider between two paragraphs carries no information and is exempt. The
+border of a text field _is_ the control — it is the only thing telling a
+low-vision user where the input begins. Splitting the token made the
+requirement apply exactly where it belongs, and the audit now asserts it.
+
+## Typography
+
+A modular scale, not arbitrary values. Sizes are in `rem` so they respect the
+user's browser setting — a fixed `px` type scale silently ignores anyone who has
+increased their default font size, which is a large number of people over 40.
+
+| Token                 | Size     | Typical use           |
+| --------------------- | -------- | --------------------- |
+| `--mrd-font-size-xs`  | 0.75rem  | Metadata, timestamps  |
+| `--mrd-font-size-sm`  | 0.875rem | Hints, secondary text |
+| `--mrd-font-size-md`  | 1rem     | Body                  |
+| `--mrd-font-size-lg`  | 1.125rem | Lead paragraphs       |
+| `--mrd-font-size-xl`  | 1.375rem | Section headings      |
+| `--mrd-font-size-2xl` | 1.75rem  | Page headings         |
+| `--mrd-font-size-3xl` | 2.25rem  | Display               |
+
+Line heights are separate tokens (`tight` 1.2, `snug` 1.35, `normal` 1.5,
+`relaxed` 1.7) rather than baked into each size, because the right line height
+depends on measure as much as on size.
+
+## Spacing
+
+The ramp is numbered by hundredths of a rem rather than by position, so
+inserting a step later does not renumber everything after it — a mistake that
+costs a codemod the first time you make it.
+
+```css
+--mrd-space-50: 0.25rem; /*  4px */
+--mrd-space-100: 0.5rem; /*  8px */
+--mrd-space-150: 0.75rem; /* 12px */
+--mrd-space-200: 1rem; /* 16px */
+--mrd-space-300: 1.5rem; /* 24px */
+--mrd-space-400: 2rem; /* 32px */
+--mrd-space-600: 3rem; /* 48px */
+```
+
+Two size tokens carry accessibility meaning rather than visual meaning, and are
+referenced by name for that reason:
+
+```css
+--mrd-size-target-min: 44px; /* WCAG 2.2 SC 2.5.8 */
+--mrd-size-focus-ring: 3px; /* with a 2px offset — SC 2.4.11 */
+```
+
+## Motion
+
+Every duration token is paired with a `prefers-reduced-motion` override that
+collapses it to `1ms` — not to `0`, so that `transitionend` listeners still
+fire and state machines that depend on them do not hang.
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --mrd-motion-duration-fast: 1ms;
+    --mrd-motion-duration-normal: 1ms;
+    --mrd-motion-duration-slow: 1ms;
+  }
+}
+```
+
+Three easing curves, and no others: `standard` for anything that starts and
+ends on screen, `decelerate` for things entering, `accelerate` for things
+leaving. A design system with eleven easing functions has none.
+
+## Theming
+
+```html
+<html data-theme="dark"></html>
+```
+
+Omit the attribute and the system follows `prefers-color-scheme`. In React:
+
+```tsx
+import { useTheme } from '@meridian/react';
+
+const { theme, resolved, setTheme } = useTheme();
+// theme: 'light' | 'dark' | 'system'   resolved: 'light' | 'dark'
+```
+
+The hook writes `data-theme`, persists the choice, and — when the choice is
+`system` — subscribes to the media query so an OS-level change is picked up
+without a reload.

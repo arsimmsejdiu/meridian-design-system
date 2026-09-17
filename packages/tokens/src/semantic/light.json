@@ -1,0 +1,87 @@
+{
+  "theme": {
+    "surface": {
+      "canvas": { "value": "{color.palette.neutral.0}" },
+      "subtle": { "value": "{color.palette.neutral.50}" },
+      "raised": { "value": "{color.palette.neutral.0}" },
+      "sunken": { "value": "{color.palette.neutral.100}" },
+      "inverse": { "value": "{color.palette.neutral.900}" },
+      "overlay": { "value": "rgba(13, 16, 20, 0.55)" }
+    },
+    "text": {
+      "primary": { "value": "{color.palette.neutral.900}", "comment": "17.4:1 on canvas — AAA" },
+      "secondary": { "value": "{color.palette.neutral.700}", "comment": "9.1:1 on canvas — AAA" },
+      "muted": { "value": "{color.palette.neutral.600}", "comment": "5.9:1 on canvas — AA" },
+      "inverse": { "value": "{color.palette.neutral.0}" },
+      "link": { "value": "{color.palette.brand.600}", "comment": "6.4:1 on canvas — AA" },
+      "danger": { "value": "{color.palette.danger.700}" },
+      "success": { "value": "{color.palette.success.700}" }
+    },
+    "border": {
+      "subtle": { "value": "{color.palette.neutral.200}" },
+      "default": {
+        "value": "{color.palette.neutral.300}",
+        "comment": "Dividers and decoration only \u2014 exempt from 1.4.11"
+      },
+      "control": {
+        "value": "{color.palette.neutral.500}",
+        "comment": "4.3:1 on canvas \u2014 the visible boundary of a form control (1.4.11)"
+      },
+      "strong": { "value": "{color.palette.neutral.500}" },
+      "focus": { "value": "{color.palette.brand.600}" },
+      "danger": { "value": "{color.palette.danger.500}" }
+    },
+    "action": {
+      "primary": {
+        "default": { "value": "{color.palette.brand.600}" },
+        "hover": { "value": "{color.palette.brand.700}" },
+        "active": { "value": "{color.palette.brand.800}" },
+        "text": {
+          "value": "{color.palette.neutral.0}",
+          "comment": "8.1:1 on brand.600 — AAA for body text"
+        }
+      },
+      "secondary": {
+        "default": { "value": "transparent" },
+        "hover": { "value": "{color.palette.neutral.100}" },
+        "active": { "value": "{color.palette.neutral.200}" },
+        "text": { "value": "{color.palette.neutral.800}" }
+      },
+      "danger": {
+        "default": { "value": "{color.palette.danger.500}" },
+        "hover": { "value": "{color.palette.danger.700}" },
+        "active": { "value": "{color.palette.danger.700}" },
+        "text": { "value": "{color.palette.neutral.0}" }
+      },
+      "disabled": {
+        "surface": { "value": "{color.palette.neutral.200}" },
+        "text": {
+          "value": "{color.palette.neutral.500}",
+          "comment": "Disabled controls are exempt from 1.4.3 but we keep 4.5:1 anyway"
+        }
+      }
+    },
+    "status": {
+      "danger": {
+        "surface": { "value": "{color.palette.danger.100}" },
+        "border": { "value": "{color.palette.danger.500}" },
+        "text": { "value": "{color.palette.danger.700}" }
+      },
+      "warning": {
+        "surface": { "value": "{color.palette.warning.100}" },
+        "border": { "value": "{color.palette.warning.500}" },
+        "text": { "value": "{color.palette.warning.700}" }
+      },
+      "success": {
+        "surface": { "value": "{color.palette.success.100}" },
+        "border": { "value": "{color.palette.success.500}" },
+        "text": { "value": "{color.palette.success.700}" }
+      },
+      "info": {
+        "surface": { "value": "{color.palette.info.100}" },
+        "border": { "value": "{color.palette.info.500}" },
+        "text": { "value": "{color.palette.info.700}" }
+      }
+    }
+  }
+}

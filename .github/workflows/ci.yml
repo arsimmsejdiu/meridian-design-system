@@ -1,0 +1,147 @@
+name: CI
+
+on:
+  push: { branches: [main] }
+  pull_request:
+  merge_group:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '20.18.0'
+  PNPM_VERSION: '9.12.0'
+
+jobs:
+  quality:
+    name: Lint, types, format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: '${{ env.PNPM_VERSION }}' }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm format:check
+      - run: pnpm lint
+      - run: pnpm stylelint "packages/**/*.scss"
+      - run: pnpm typecheck
+
+  tokens:
+    name: Tokens & contrast audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: '${{ env.PNPM_VERSION }}' }
+      - uses: actions/setup-node@v4
+        with: { node-version: '${{ env.NODE_VERSION }}', cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @meridian/tokens build
+      # Fails the build if any shipped foreground/background pair drops below
+      # its WCAG minimum. A design system without this drifts within a quarter.
+      - name: WCAG contrast audit
+        run: node packages/tokens/build/audit-contrast.mjs
+
+  unit:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: '${{ env.PNPM_VERSION }}' }
+      - uses: actions/setup-node@v4
+        with: { node-version: '${{ env.NODE_VERSION }}', cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @meridian/tokens build
+      - run: pnpm --filter @meridian/components test -- --coverage
+      - run: pnpm --filter @meridian/react test
+      - uses: codecov/codecov-action@v4
+        with: { fail_ci_if_error: false }
+
+  e2e:
+    name: Browser tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: '${{ env.PNPM_VERSION }}' }
+      - uses: actions/setup-node@v4
+        with: { node-version: '${{ env.NODE_VERSION }}', cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: pnpm --filter @meridian/components test:e2e
+
+  a11y:
+    name: Accessibility (axe over every story)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: '${{ env.PNPM_VERSION }}' }
+      - uses: actions/setup-node@v4
+        with: { node-version: '${{ env.NODE_VERSION }}', cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm build
+      - run: pnpm --filter @meridian/docs build
+      - name: Serve Storybook and run axe
+        run: |
+          pnpm exec concurrently -k -s first -n SB,TEST \
+            "pnpm exec http-server apps/docs/storybook-static --port 6006 --silent" \
+            "pnpm exec wait-on tcp:6006 && pnpm --filter @meridian/docs test:a11y"
+
+  example:
+    name: Example app builds
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: '${{ env.PNPM_VERSION }}' }
+      - uses: actions/setup-node@v4
+        with: { node-version: '${{ env.NODE_VERSION }}', cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      # The example consumes the packages exactly as an external app would. If a
+      # published export map or a peer range is wrong, this is where it surfaces
+      # — before a consumer finds it.
+      - run: pnpm --filter @meridian/example-react-checkout build
+
+  size:
+    name: Bundle size
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: '${{ env.PNPM_VERSION }}' }
+      - uses: actions/setup-node@v4
+        with: { node-version: '${{ env.NODE_VERSION }}', cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      # A design system is a dependency of everything. Growth has to be a
+      # deliberate decision, not a surprise found in production.
+      - run: pnpm size
+
+  visual:
+    name: Visual regression
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'pull_request' }}
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: pnpm/action-setup@v4
+        with: { version: '${{ env.PNPM_VERSION }}' }
+      - uses: actions/setup-node@v4
+        with: { node-version: '${{ env.NODE_VERSION }}', cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - uses: chromaui/action@latest
+        with:
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          workingDir: apps/docs
+          exitZeroOnChanges: true
+          onlyChanged: true

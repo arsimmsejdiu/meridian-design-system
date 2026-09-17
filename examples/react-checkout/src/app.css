@@ -1,0 +1,233 @@
+/*
+ * Application styling only. Note what is absent: not one hex value, not one
+ * hard-coded pixel size. Everything comes from the token layer, which is what
+ * makes the dark theme free — there is nothing here to re-theme.
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--mrd-theme-surface-canvas);
+  color: var(--mrd-theme-text-primary);
+  font-family: var(--mrd-font-family-sans);
+  font-size: var(--mrd-font-size-md);
+  line-height: var(--mrd-font-line-height-normal);
+  /* Stops iOS inflating text in one column and not the others on rotate. */
+  -webkit-text-size-adjust: 100%;
+}
+
+/* ------------------------------------------------------------ skip link */
+
+.skip-link {
+  position: absolute;
+  inset-inline-start: var(--mrd-space-200);
+  inset-block-start: var(--mrd-space-200);
+  z-index: var(--mrd-z-index-toast);
+  padding: var(--mrd-space-100) var(--mrd-space-200);
+  border-radius: var(--mrd-radius-md);
+  background: var(--mrd-theme-surface-raised);
+  color: var(--mrd-theme-text-link);
+  box-shadow: var(--mrd-elevation-2);
+
+  /* Off-screen until focused, rather than display:none — a hidden element
+     cannot receive focus, which defeats the point of a skip link. */
+  transform: translateY(-200%);
+  transition: transform var(--mrd-motion-duration-fast) var(--mrd-motion-easing-standard);
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
+/* --------------------------------------------------------------- layout */
+
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--mrd-space-200);
+  padding: var(--mrd-space-200) var(--mrd-space-300);
+  border-block-end: 1px solid var(--mrd-theme-border-subtle);
+}
+
+.wordmark {
+  font-weight: var(--mrd-font-weight-semibold);
+  letter-spacing: var(--mrd-font-letter-spacing-tight);
+}
+
+main {
+  /* 34rem is roughly 65 characters at the body size — the measure at which
+     reading speed peaks. Wider forms are not more efficient, they just look
+     emptier. */
+  max-inline-size: 34rem;
+  margin: 0 auto;
+  padding: var(--mrd-space-400) var(--mrd-space-200) var(--mrd-space-600);
+}
+
+main:focus {
+  outline: none;
+}
+
+h1 {
+  margin-block: 0 var(--mrd-space-300);
+  font-size: var(--mrd-font-size-2xl);
+  line-height: var(--mrd-font-line-height-tight);
+}
+
+.site-footer {
+  max-inline-size: 34rem;
+  margin: 0 auto;
+  padding: var(--mrd-space-300) var(--mrd-space-200) var(--mrd-space-600);
+  border-block-start: 1px solid var(--mrd-theme-border-subtle);
+  color: var(--mrd-theme-text-muted);
+  font-size: var(--mrd-font-size-sm);
+}
+
+/* -------------------------------------------------------------- progress */
+
+.progress {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mrd-space-100) var(--mrd-space-300);
+  margin: 0 0 var(--mrd-space-300);
+  padding: 0;
+  list-style: none;
+  font-size: var(--mrd-font-size-sm);
+  counter-reset: step;
+}
+
+.progress__item {
+  display: flex;
+  align-items: center;
+  gap: var(--mrd-space-100);
+  color: var(--mrd-theme-text-muted);
+  counter-increment: step;
+}
+
+.progress__item::before {
+  content: counter(step);
+  display: grid;
+  place-items: center;
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+  border: 1px solid currentcolor;
+  border-radius: var(--mrd-radius-pill);
+  font-size: var(--mrd-font-size-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.progress__item--current {
+  color: var(--mrd-theme-text-primary);
+  font-weight: var(--mrd-font-weight-semibold);
+}
+
+.progress__item--current::before {
+  border-color: var(--mrd-theme-action-primary-default);
+  background: var(--mrd-theme-action-primary-default);
+  color: var(--mrd-theme-action-primary-text);
+}
+
+.progress__item--done::before {
+  /* A tick as well as a colour change — the state must survive greyscale. */
+  content: '✓';
+  border-color: var(--mrd-theme-text-success);
+  color: var(--mrd-theme-text-success);
+}
+
+/* ----------------------------------------------------------------- form */
+
+.step-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--mrd-space-100);
+  margin-block: 0 var(--mrd-space-200);
+  font-size: var(--mrd-font-size-xl);
+}
+
+.step-heading:focus {
+  outline: none;
+}
+
+.step-heading:focus-visible {
+  outline: var(--mrd-size-focus-ring) solid var(--mrd-theme-border-focus);
+  outline-offset: var(--mrd-size-focus-offset);
+  border-radius: var(--mrd-radius-sm);
+}
+
+.step-heading__count {
+  color: var(--mrd-theme-text-muted);
+  font-size: var(--mrd-font-size-sm);
+  font-weight: var(--mrd-font-weight-regular);
+}
+
+.stack {
+  display: grid;
+  gap: var(--mrd-space-200);
+  margin-block-start: var(--mrd-space-200);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 6rem 1fr 5rem;
+  gap: var(--mrd-space-150);
+}
+
+/* One breakpoint, and it is in `rem` so it moves with the user's font size. */
+@media (max-width: 30rem) {
+  .row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mrd-space-100);
+  justify-content: flex-end;
+  margin-block-start: var(--mrd-space-300);
+}
+
+address {
+  font-style: normal;
+  line-height: var(--mrd-font-line-height-relaxed);
+}
+
+/* ----------------------------------------------------------- theme switch */
+
+.theme-switch select {
+  padding: var(--mrd-space-50) var(--mrd-space-100);
+  border: 1px solid var(--mrd-theme-border-default);
+  border-radius: var(--mrd-radius-sm);
+  background: var(--mrd-theme-surface-raised);
+  color: inherit;
+  font: inherit;
+  /* Native select, deliberately: a custom listbox here would be one more
+     thing to test with a screen reader for no user benefit. */
+  min-block-size: var(--mrd-size-target-min);
+}
+
+.theme-switch select:focus-visible {
+  outline: var(--mrd-size-focus-ring) solid var(--mrd-theme-border-focus);
+  outline-offset: var(--mrd-size-focus-offset);
+}
+
+/* -------------------------------------------------------------- utility */
+
+.visually-hidden {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
