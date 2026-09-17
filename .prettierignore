@@ -1,0 +1,21 @@
+# Generated — rewritten by `stencil build` on every run.
+packages/components/src/components.d.ts
+packages/components/src/components/**/readme.md
+packages/components/custom-elements.json
+packages/react/src/generated/
+packages/angular/src/generated/
+pnpm-lock.yaml
+
+# Build output
+dist/
+dist-src/
+hydrate/
+loader/
+storybook-static/
+
+packages/*/dist/
+packages/*/dist-src/
+packages/*/hydrate/
+packages/*/loader/
+apps/*/storybook-static/
+examples/*/dist/

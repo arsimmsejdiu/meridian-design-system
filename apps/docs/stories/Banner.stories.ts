@@ -172,9 +172,9 @@ export const RolesMatchTone: Story = {
 
     await waitFor(() => expect(canvasElement.querySelector('#b-status')!.shadowRoot).toBeTruthy());
 
-    expect(roleOf('b-status')).toBe('status');
-    expect(roleOf('b-alert')).toBe('alert');
-    expect(roleOf('b-static')).toBeNull();
+    await expect(roleOf('b-status')).toBe('status');
+    await expect(roleOf('b-alert')).toBe('alert');
+    await expect(roleOf('b-static')).toBeNull();
   },
 };
 

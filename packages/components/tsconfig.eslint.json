@@ -1,0 +1,8 @@
+{
+  // Lint sees everything, including the tests. The build tsconfig excludes
+  // spec and e2e files because Stencil compiles them separately — but a test
+  // that does not typecheck is exactly the kind of thing lint should catch.
+  "extends": "./tsconfig.json",
+  "include": ["src", "stencil.config.ts"],
+  "exclude": ["node_modules", "dist"]
+}

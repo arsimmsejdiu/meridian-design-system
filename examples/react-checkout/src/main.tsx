@@ -9,7 +9,10 @@ import '@meridian/tokens/css';
 import '@meridian/components';
 import './app.css';
 
-createRoot(document.getElementById('root')!).render(
+const root = document.getElementById('root');
+if (!root) throw new Error('No #root element — check index.html.');
+
+createRoot(root).render(
   <StrictMode>
     <App />
   </StrictMode>,

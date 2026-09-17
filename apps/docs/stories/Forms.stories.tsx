@@ -206,14 +206,19 @@ function MemberRows({ control }: { control: Control<TeamValues> }) {
           <div style={{ flex: 1 }}>
             <FormTextField
               control={control}
-              name={`members.${index}.email`}
-              label={`Member ${index + 1} email`}
+              // React Hook Form types field-array paths as a template-literal
+              // union over `number`, so the index has to be interpolated as a
+              // number — stringifying it produces `members.${string}.email`,
+              // which does not match.
+              // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+              name={`members.${index}.email` as const}
+              label={`Member ${String(index + 1)} email`}
               type="email"
             />
           </div>
           <mrd-button
             variant="ghost"
-            label={`Remove member ${index + 1}`}
+            label={`Remove member ${String(index + 1)}`}
             onClick={() => remove(index)}
           >
             <span slot="start" aria-hidden="true">
@@ -334,12 +339,12 @@ export const SummaryAppearsAndFocuses: Story = {
     await userEvent.click(canvas.getByText('Create account'));
 
     const summary = await waitFor(() => {
-      const el = canvasElement.querySelector('mrd-banner[tone="danger"]');
-      expect(el).toBeTruthy();
-      return el as HTMLElement;
+      const el = canvasElement.querySelector<HTMLElement>('mrd-banner[tone="danger"]');
+      if (!el) throw new Error('Error summary did not appear after a failed submit.');
+      return el;
     });
 
     await waitFor(() => expect(document.activeElement).toBe(summary));
-    expect(summary.querySelectorAll('li').length).toBe(4);
+    await expect(summary.querySelectorAll('li').length).toBe(4);
   },
 };

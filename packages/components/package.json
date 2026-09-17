@@ -13,6 +13,8 @@
   "files": [
     "dist/",
     "loader/",
+    "hydrate/",
+    "custom-elements-types.d.ts",
     "custom-elements.json"
   ],
   "scripts": {
@@ -22,15 +24,15 @@
     "test:e2e": "stencil test --e2e",
     "test:a11y": "stencil test --e2e",
     "test:watch": "stencil test --spec --watchAll",
-    "lint": "eslint src --ext .ts,.tsx",
+    "lint": "eslint src",
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
     "@stencil/core": "^4.22.1"
   },
   "devDependencies": {
-    "@stencil/angular-output-target": "^0.8.4",
-    "@stencil/react-output-target": "^0.5.3",
+    "@stencil/angular-output-target": "^1.5.0",
+    "@stencil/react-output-target": "^1.6.2",
     "@stencil/sass": "^3.0.12",
     "@types/jest": "^29.5.14",
     "@meridian/tokens": "workspace:*",
@@ -39,5 +41,34 @@
     "jest-cli": "^29.7.0",
     "puppeteer": "^23.6.0",
     "typescript": "^5.6.3"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs.js"
+    },
+    "./components": {
+      "types": "./custom-elements-types.d.ts",
+      "import": "./dist/components/index.js"
+    },
+    "./dist/components": {
+      "types": "./custom-elements-types.d.ts",
+      "import": "./dist/components/index.js"
+    },
+    "./dist/components/*": "./dist/components/*",
+    "./hydrate": {
+      "types": "./hydrate/index.d.ts",
+      "import": "./hydrate/index.js",
+      "require": "./hydrate/index.cjs.js"
+    },
+    "./loader": {
+      "types": "./loader/index.d.ts",
+      "import": "./loader/index.js",
+      "require": "./loader/index.cjs.js"
+    },
+    "./dist/*": "./dist/*",
+    "./custom-elements.json": "./custom-elements.json",
+    "./package.json": "./package.json"
   }
 }

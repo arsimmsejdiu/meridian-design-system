@@ -1,4 +1,5 @@
-import { Component, Prop, Event, EventEmitter, h, Host, State } from '@stencil/core';
+import type { EventEmitter } from '@stencil/core';
+import { Component, Prop, Event, h, Host, State } from '@stencil/core';
 
 export type BannerTone = 'info' | 'success' | 'warning' | 'danger';
 

@@ -35,8 +35,13 @@ describe('mrd-text-field', () => {
     );
     const sr = page.root!.shadowRoot!;
     const ids = sr.querySelector('input')!.getAttribute('aria-describedby')!.split(' ');
-    expect(sr.querySelector(`#${ids[0]}`)!.textContent).toBe('Receipts only');
-    expect(sr.querySelector(`#${ids[1]}`)!.textContent).toContain('Enter a valid email');
+    expect(ids).toHaveLength(2);
+    const [hintId, errorId] = ids as [string, string];
+
+    // Order matters: the hint is read before the error, so the error lands as
+    // context on top of the instruction rather than replacing it.
+    expect(sr.querySelector(`#${hintId}`)!.textContent).toBe('Receipts only');
+    expect(sr.querySelector(`#${errorId}`)!.textContent).toContain('Enter a valid email');
   });
 
   it('marks the input invalid only when an error is present', async () => {

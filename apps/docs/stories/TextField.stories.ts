@@ -175,12 +175,12 @@ export const ErrorIsAnnounced: Story = {
     await waitFor(() => expect(host.shadowRoot).toBeTruthy());
 
     const input = host.shadowRoot!.querySelector('input')!;
-    expect(input.getAttribute('aria-invalid')).toBe('true');
+    await expect(input.getAttribute('aria-invalid')).toBe('true');
 
     const describedBy = input.getAttribute('aria-describedby')!;
     const message = host.shadowRoot!.getElementById(describedBy.split(' ').pop()!)!;
-    expect(message.getAttribute('role')).toBe('alert');
-    expect(message.textContent).toContain('name@example.com');
+    await expect(message.getAttribute('role')).toBe('alert');
+    await expect(message.textContent).toContain('name@example.com');
   },
 };
 
@@ -194,7 +194,7 @@ export const LabelFocusesInput: Story = {
     const label = host.shadowRoot!.querySelector('label')!;
     await userEvent.click(label);
 
-    expect(host.shadowRoot!.activeElement).toBe(host.shadowRoot!.querySelector('input'));
+    await expect(host.shadowRoot!.activeElement).toBe(host.shadowRoot!.querySelector('input'));
   },
 };
 
@@ -213,6 +213,6 @@ export const EmitsInputEvents: Story = {
     await userEvent.type(host.shadowRoot!.querySelector('input')!, 'Zug');
 
     await waitFor(() => expect(seen.at(-1)).toBe('Zug'));
-    expect(within(canvasElement).queryByText('undefined')).toBeNull();
+    await expect(within(canvasElement).queryByText('undefined')).toBeNull();
   },
 };

@@ -1,15 +1,5 @@
-import {
-  Component,
-  Prop,
-  State,
-  Watch,
-  Method,
-  Event,
-  EventEmitter,
-  Element,
-  h,
-  Host,
-} from '@stencil/core';
+import type { EventEmitter } from '@stencil/core';
+import { Component, Prop, State, Watch, Method, Event, Element, h, Host } from '@stencil/core';
 import { getFocusableElements, FocusTrap } from '../../utils/focus';
 import { lockScroll, unlockScroll } from '../../utils/scroll-lock';
 
@@ -39,6 +29,12 @@ import { lockScroll, unlockScroll } from '../../utils/scroll-lock';
  * @part body - Scrollable body region.
  * @part footer - Footer region.
  */
+/**
+ * Why a dialog closed. Consumers branch on this: dismissing with Escape is not
+ * the same as confirming, and an autosave-on-close should not fire for either.
+ */
+export type DialogCloseReason = 'escape' | 'backdrop' | 'close-button' | 'programmatic';
+
 @Component({
   tag: 'mrd-dialog',
   styleUrl: 'mrd-dialog.scss',
@@ -48,7 +44,7 @@ export class MrdDialog {
   @Element() host!: HTMLMrdDialogElement;
 
   private dialogEl?: HTMLDialogElement;
-  private trap?: FocusTrap;
+  private trap: FocusTrap | undefined;
   private previouslyFocused?: HTMLElement | null;
   private readonly headingId = `mrd-dialog-title-${Math.random().toString(36).slice(2, 9)}`;
 
@@ -85,9 +81,7 @@ export class MrdDialog {
   @Event({ eventName: 'mrdOpen', cancelable: true }) mrdOpen!: EventEmitter<void>;
 
   /** Fired after closing, with the reason. */
-  @Event({ eventName: 'mrdClose' }) mrdClose!: EventEmitter<{
-    reason: 'escape' | 'backdrop' | 'close-button' | 'programmatic';
-  }>;
+  @Event({ eventName: 'mrdClose' }) mrdClose!: EventEmitter<{ reason: DialogCloseReason }>;
 
   componentWillLoad() {
     this.hasFooter = Boolean(this.host.querySelector('[slot="footer"]'));
@@ -146,7 +140,7 @@ export class MrdDialog {
     target?.focus();
   }
 
-  private deactivate(reason: Parameters<typeof this.mrdClose.emit>[0]['reason']) {
+  private deactivate(reason: DialogCloseReason) {
     this.trap?.deactivate();
     this.trap = undefined;
     unlockScroll();

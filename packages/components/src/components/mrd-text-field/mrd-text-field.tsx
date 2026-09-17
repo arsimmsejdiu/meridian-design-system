@@ -1,15 +1,5 @@
-import {
-  Component,
-  Prop,
-  State,
-  Event,
-  EventEmitter,
-  Method,
-  Element,
-  h,
-  Host,
-  Watch,
-} from '@stencil/core';
+import type { EventEmitter } from '@stencil/core';
+import { Component, Prop, State, Event, Method, Element, h, Host, Watch } from '@stencil/core';
 
 export type TextFieldType = 'text' | 'email' | 'password' | 'search' | 'tel' | 'url' | 'number';
 
@@ -98,9 +88,20 @@ export class MrdTextField {
   @Event({ eventName: 'mrdBlur' }) mrdBlur!: EventEmitter<void>;
 
   connectedCallback() {
-    // Available only where ElementInternals is supported; the field still works
-    // without it, it just won't participate in native form submission.
-    this.internals = this.host.attachInternals?.();
+    /*
+     * Form association is progressive enhancement, and the feature detection has
+     * to be done on the *methods*, not on `attachInternals` itself. Safari 16.4
+     * ships `attachInternals()` but returns an object without `setFormValue`,
+     * and so does Stencil's test environment — calling it blind throws during
+     * connect and takes the whole component down, on the browser least likely
+     * to be in anyone's test matrix.
+     *
+     * Without it the field still renders, validates and announces correctly; it
+     * just does not submit with a native `<form>`.
+     */
+    const internals = this.host.attachInternals?.();
+    this.internals = typeof internals?.setFormValue === 'function' ? internals : undefined;
+
     this.syncFormValue();
   }
 
@@ -111,7 +112,7 @@ export class MrdTextField {
 
   @Watch('error')
   syncValidity() {
-    if (!this.internals) return;
+    if (typeof this.internals?.setValidity !== 'function') return;
     if (this.error) this.internals.setValidity({ customError: true }, this.error, this.inputEl);
     else this.internals.setValidity({});
   }

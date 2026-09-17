@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { type ReactElement, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { MeridianForm, FormTextField } from '@meridian/react';
 import {
@@ -11,15 +11,20 @@ import {
 
 type StepId = 'contact' | 'address' | 'payment';
 
-const STEPS: Array<{ id: StepId; title: string }> = [
+const STEPS = [
   { id: 'contact', title: 'Your details' },
   { id: 'address', title: 'Delivery address' },
   { id: 'payment', title: 'Payment' },
-];
+] as const satisfies ReadonlyArray<{ id: StepId; title: string }>;
+
+// Destructuring a const tuple gives a defined element, which is what lets the
+// bounds fallback below typecheck under `noUncheckedIndexedAccess` without an
+// assertion. A non-null assertion would compile too, and would be a lie.
+const [FIRST_STEP] = STEPS;
 
 /* ------------------------------------------------------------------ steps */
 
-function ContactFields() {
+function ContactFields(): ReactElement {
   const { control } = useFormContext<CheckoutValues>();
   return (
     <div className="stack">
@@ -51,7 +56,7 @@ function ContactFields() {
   );
 }
 
-function AddressFields() {
+function AddressFields(): ReactElement {
   const { control } = useFormContext<CheckoutValues>();
   return (
     <div className="stack">
@@ -90,7 +95,7 @@ function AddressFields() {
   );
 }
 
-function PaymentFields() {
+function PaymentFields(): ReactElement {
   const { control } = useFormContext<CheckoutValues>();
   return (
     <div className="stack">
@@ -117,7 +122,7 @@ function PaymentFields() {
 
 /* --------------------------------------------------------------- progress */
 
-function Progress({ current }: { current: number }) {
+function Progress({ current }: { current: number }): ReactElement {
   return (
     <nav aria-label="Checkout progress">
       <ol className="progress">
@@ -145,7 +150,7 @@ function Progress({ current }: { current: number }) {
 
 /* ---------------------------------------------------------------- summary */
 
-function Receipt({ values }: { values: CheckoutValues }) {
+function Receipt({ values }: { values: CheckoutValues }): ReactElement {
   return (
     <>
       <mrd-banner tone="success" heading="Order confirmed" live>
@@ -166,13 +171,15 @@ function Receipt({ values }: { values: CheckoutValues }) {
 
 /* ----------------------------------------------------------------- shell */
 
-export function Checkout() {
+export function Checkout(): ReactElement {
   const [stepIndex, setStepIndex] = useState(0);
   const [values, setValues] = useState<CheckoutValues>(emptyCheckout);
   const [done, setDone] = useState(false);
   const headingRef = useRef<HTMLHeadingElement>(null);
 
-  const step = STEPS[stepIndex]!;
+  // stepIndex only ever comes from STEPS' own bounds, but the compiler cannot
+  // know that — so fall back rather than assert.
+  const step = STEPS[stepIndex] ?? FIRST_STEP;
   const schema =
     step.id === 'contact' ? contactSchema : step.id === 'address' ? addressSchema : paymentSchema;
 
@@ -229,7 +236,12 @@ export function Checkout() {
 
         <div className="actions">
           {stepIndex > 0 && (
-            <mrd-button variant="ghost" onClick={() => goTo(stepIndex - 1)}>
+            <mrd-button
+              variant="ghost"
+              onClick={() => {
+                goTo(stepIndex - 1);
+              }}
+            >
               Back
             </mrd-button>
           )}

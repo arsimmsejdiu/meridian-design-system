@@ -1,7 +1,8 @@
+import type { ReactElement } from 'react';
 import { useTheme } from '@meridian/react';
 import { Checkout } from './Checkout';
 
-export function App() {
+export function App(): ReactElement {
   const { theme, setTheme, resolved } = useTheme();
 
   return (
@@ -16,7 +17,12 @@ export function App() {
 
         <label className="theme-switch">
           <span className="visually-hidden">Colour theme</span>
-          <select value={theme} onChange={event => setTheme(event.target.value as typeof theme)}>
+          <select
+            value={theme}
+            onChange={event => {
+              setTheme(event.target.value as typeof theme);
+            }}
+          >
             <option value="system">System ({resolved})</option>
             <option value="light">Light</option>
             <option value="dark">Dark</option>

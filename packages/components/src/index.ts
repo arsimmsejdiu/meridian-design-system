@@ -9,9 +9,22 @@
 
 export type { ButtonVariant, ButtonSize, ButtonType } from './components/mrd-button/mrd-button';
 export type { TextFieldType } from './components/mrd-text-field/mrd-text-field';
+export type { DialogCloseReason } from './components/mrd-dialog/mrd-dialog';
 export type { BannerTone } from './components/mrd-banner/mrd-banner';
 
 export { getFocusableElements, FocusTrap, RovingTabindex } from './utils/focus';
 export { lockScroll, unlockScroll } from './utils/scroll-lock';
 
-export { Components, JSX } from './components';
+export type { Components, JSX } from './components';
+
+/**
+ * Per-component event types, re-exported so consumers (and the generated React
+ * and Angular bindings) can name the payload of an event without importing from
+ * the generated `components.d.ts` directly.
+ */
+export type {
+  MrdButtonCustomEvent,
+  MrdTextFieldCustomEvent,
+  MrdDialogCustomEvent,
+  MrdBannerCustomEvent,
+} from './components';

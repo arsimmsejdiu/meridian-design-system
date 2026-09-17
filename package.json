@@ -23,15 +23,17 @@
     "changeset": "changeset",
     "version-packages": "changeset version && pnpm install --lockfile-only",
     "release": "turbo run build --filter=./packages/* && changeset publish",
-    "stylelint": "stylelint \"packages/**/*.scss\"",
+    "stylelint": "stylelint \"packages/*/src/**/*.scss\"",
     "audit:contrast": "node packages/tokens/build/audit-contrast.mjs",
     "example": "pnpm --filter @meridian/example-react-checkout dev"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.9",
+    "@eslint/js": "^9.13.0",
     "@size-limit/preset-small-lib": "^11.1.6",
     "concurrently": "^9.0.1",
     "eslint": "^9.13.0",
+    "globals": "^15.11.0",
     "http-server": "^14.1.1",
     "prettier": "^3.3.3",
     "size-limit": "^11.1.6",
@@ -39,6 +41,7 @@
     "stylelint-config-standard-scss": "^13.1.0",
     "turbo": "^2.2.3",
     "typescript": "^5.6.3",
+    "typescript-eslint": "^8.12.0",
     "wait-on": "^8.0.1"
   }
 }

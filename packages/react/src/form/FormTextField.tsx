@@ -71,7 +71,9 @@ export function FormTextField<T extends FieldValues>({
       const detail = (event as CustomEvent<{ value: string }>).detail;
       field.onChange(detail.value);
     };
-    const onBlur = () => field.onBlur();
+    const onBlur = () => {
+      field.onBlur();
+    };
 
     el.addEventListener('mrdInput', onInput);
     el.addEventListener('mrdBlur', onBlur);
@@ -97,7 +99,24 @@ export function FormTextField<T extends FieldValues>({
     (el: MrdTextFieldElement | null) => {
       elementRef.current = el;
       if (!focusOnError) return;
-      field.ref(el ? ({ focus: () => void el.setFocus(), name } as unknown as HTMLElement) : null);
+
+      if (!el) {
+        field.ref(null);
+        return;
+      }
+
+      /*
+       * RHF only ever calls `.focus()` and reads `.name` on what it is given, so
+       * a two-property stand-in is enough — and it is the only way to route the
+       * call to the component's own `setFocus()`, which is what actually reaches
+       * the input inside the shadow root.
+       */
+      field.ref({
+        name,
+        focus: () => {
+          void el.setFocus();
+        },
+      });
     },
     [field, name, focusOnError],
   );

@@ -112,7 +112,10 @@ export function MeridianForm<T extends FieldValues>({
         noValidate
         className={className}
         aria-busy={isSubmitting || undefined}
-        onSubmit={methods.handleSubmit(onSubmit)}
+        onSubmit={event => {
+          // handleSubmit returns a promise; React's onSubmit expects void.
+          void methods.handleSubmit(onSubmit)(event);
+        }}
       >
         {showSummary && (
           <mrd-banner

@@ -24,12 +24,30 @@ describe('mrd-banner', () => {
   });
 
   it('gives each tone a distinct icon shape, not only a colour', async () => {
-    const shapes = await Promise.all(
-      ['info', 'success', 'warning', 'danger'].map(async tone => {
-        const page = await render(`<mrd-banner tone="${tone}">x</mrd-banner>`);
-        return page.root!.shadowRoot!.querySelector('.icon svg')!.innerHTML;
-      }),
-    );
+    /*
+     * Turn the page greyscale and the four tones must still be distinguishable —
+     * WCAG 1.4.1. We compare path geometry rather than `innerHTML`, which
+     * Stencil's mock DOM does not serialise for SVG.
+     *
+     * Rendered in sequence, not with Promise.all: `newSpecPage` mutates one
+     * shared mock document, so concurrent calls clobber each other and every
+     * assertion ends up reading the last page rendered. That failure mode is
+     * quiet — the test passes for the wrong reason as often as it fails.
+     */
+    const shapes: string[] = [];
+
+    for (const tone of ['info', 'success', 'warning', 'danger']) {
+      const page = await render(`<mrd-banner tone="${tone}">x</mrd-banner>`);
+      const paths = page.root!.shadowRoot!.querySelectorAll('.icon svg path');
+
+      expect(paths.length).toBeGreaterThan(0);
+      shapes.push(
+        Array.from(paths)
+          .map(path => path.getAttribute('d'))
+          .join('|'),
+      );
+    }
+
     expect(new Set(shapes).size).toBe(4);
   });
 

@@ -39,6 +39,7 @@
 :host([size="sm"]) .button {
   @include control-size("sm");
 }
+
 :host([size="lg"]) .button {
   @include control-size("lg");
 }
@@ -51,6 +52,7 @@
   &:hover:not(:disabled) {
     background-color: var(--mrd-theme-action-primary-hover);
   }
+
   &:active:not(:disabled) {
     background-color: var(--mrd-theme-action-primary-active);
   }
@@ -64,6 +66,7 @@
   &:hover:not(:disabled) {
     background-color: var(--mrd-theme-action-secondary-hover);
   }
+
   &:active:not(:disabled) {
     background-color: var(--mrd-theme-action-secondary-active);
   }

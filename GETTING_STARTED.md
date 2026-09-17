@@ -14,12 +14,12 @@ gh repo create arsimmsejdiu/meridian-design-system --public --source=. --push
 
 ## Then, in the repository settings
 
-| Setting | Why |
-|---|---|
+| Setting                                                                                  | Why                                         |
+| ---------------------------------------------------------------------------------------- | ------------------------------------------- |
 | Branch protection on `main`, requiring the `quality`, `tokens`, `unit` and `a11y` checks | The gates only mean something if they block |
-| Secret `CHROMATIC_PROJECT_TOKEN` | Visual regression on pull requests |
-| Secret `NPM_TOKEN` | Only if you actually publish to npm |
-| Pages → GitHub Actions | `docs.yml` deploys Storybook there |
+| Secret `CHROMATIC_PROJECT_TOKEN`                                                         | Visual regression on pull requests          |
+| Secret `NPM_TOKEN`                                                                       | Only if you actually publish to npm         |
+| Pages → GitHub Actions                                                                   | `docs.yml` deploys Storybook there          |
 
 `ci.yml` runs without any secrets. The Chromatic job is skipped when its token
 is absent, so the build stays green on a fresh clone.

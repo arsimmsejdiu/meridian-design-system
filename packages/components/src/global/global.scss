@@ -15,7 +15,7 @@
  */
 
 :where(html) {
-  -webkit-text-size-adjust: 100%;
+  /* Stops iOS inflating text in one column and not the others on rotate. */
   text-size-adjust: 100%;
 }
 

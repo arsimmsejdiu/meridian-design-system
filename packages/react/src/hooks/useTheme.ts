@@ -12,13 +12,24 @@ function subscribeToSystem(onChange: () => void) {
   if (typeof window === 'undefined' || !window.matchMedia) return () => undefined;
   const mql = window.matchMedia(QUERY);
 
-  // Safari below 14 has no addEventListener on MediaQueryList.
   if (mql.addEventListener) {
     mql.addEventListener('change', onChange);
-    return () => mql.removeEventListener('change', onChange);
+    return () => {
+      mql.removeEventListener('change', onChange);
+    };
   }
+
+  /*
+   * Safari below 14 has no addEventListener on MediaQueryList. The deprecated
+   * pair is the only way to reach those browsers, and a theme that silently
+   * stops following the system is worse than using a deprecated API.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-deprecated
   mql.addListener(onChange);
-  return () => mql.removeListener(onChange);
+  return () => {
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
+    mql.removeListener(onChange);
+  };
 }
 
 const getSystemTheme = (): ResolvedTheme =>
@@ -89,11 +100,16 @@ export function useTheme() {
     const onStorage = (event: StorageEvent) => {
       if (event.key === STORAGE_KEY) setThemeState(readStoredTheme());
     };
+
     window.addEventListener('storage', onStorage);
-    return () => window.removeEventListener('storage', onStorage);
+    return () => {
+      window.removeEventListener('storage', onStorage);
+    };
   }, []);
 
-  const setTheme = useCallback((next: Theme) => setThemeState(next), []);
+  const setTheme = useCallback((next: Theme) => {
+    setThemeState(next);
+  }, []);
 
   const resolved: ResolvedTheme = theme === 'system' ? systemTheme : theme;
 

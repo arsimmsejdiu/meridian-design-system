@@ -1,19 +1,19 @@
 [
   {
-    "name": "components — full bundle, gzipped",
-    "path": "packages/components/dist/meridian/*.esm.js",
-    "limit": "22 kB"
-  },
-  {
-    "name": "components — one lazy-loaded component",
-    "path": "packages/components/dist/meridian/mrd-button.entry.js",
-    "limit": "3 kB"
-  },
-  {
     "name": "tokens CSS",
     "path": "packages/tokens/dist/tokens.css",
     "gzip": true,
     "limit": "3 kB"
+  },
+  {
+    "name": "one component, standalone (mrd-button + runtime)",
+    "path": "packages/components/dist/components/mrd-button.js",
+    "limit": "12 kB"
+  },
+  {
+    "name": "text field, standalone",
+    "path": "packages/components/dist/components/mrd-text-field.js",
+    "limit": "14 kB"
   },
   {
     "name": "react — form adapters, excluding peers",
@@ -23,7 +23,7 @@
     "limit": "4 kB"
   },
   {
-    "name": "react — useTheme alone",
+    "name": "react — useTheme alone (tree-shaking check)",
     "path": "packages/react/dist/index.js",
     "import": "{ useTheme }",
     "ignore": ["react"],

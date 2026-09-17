@@ -4,8 +4,8 @@
   "private": true,
   "description": "Storybook \u2014 the design system's documentation and visual test surface.",
   "scripts": {
-    "dev": "storybook dev -p 6006 --no-open",
-    "build": "storybook build -o storybook-static",
+    "dev": "storybook dev -p 6006 --no-open --disable-telemetry",
+    "build": "storybook build -o storybook-static --disable-telemetry",
     "test:a11y": "test-storybook --maxWorkers=2",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
@@ -23,7 +23,9 @@
     "@storybook/blocks": "^8.4.2",
     "@storybook/test": "^8.4.2",
     "@storybook/test-runner": "^0.19.1",
+    "@storybook/web-components": "^8.4.2",
     "@storybook/web-components-vite": "^8.4.2",
+    "@types/node": "^22.9.0",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.3",

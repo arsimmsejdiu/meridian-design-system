@@ -24,6 +24,7 @@
 :host([size="sm"]) .dialog {
   inline-size: min(100vw - var(--mrd-space-400), 24rem);
 }
+
 :host([size="lg"]) .dialog {
   inline-size: min(100vw - var(--mrd-space-400), 48rem);
 }
@@ -69,6 +70,7 @@
   &:focus {
     outline: none;
   }
+
   @include focus-ring;
 }
 

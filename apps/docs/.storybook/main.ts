@@ -24,7 +24,7 @@ const config: StorybookConfig = {
    * The alternative — a separate `@storybook/react` instance — means two dev
    * servers, two Chromatic projects and two a11y runs for one design system.
    */
-  viteFinal: async config => {
+  viteFinal: config => {
     config.plugins = config.plugins ?? [];
     config.plugins.push(react({ include: /\.tsx$/ }));
     return config;

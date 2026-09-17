@@ -7,7 +7,22 @@
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "noUnusedLocals": false,
-    "outDir": "dist"
+    "outDir": "dist",
+    /*
+     * Off for this package only; on everywhere else (see tsconfig.base.json).
+     *
+     * Stencil's generated JSX typings declare optional DOM attributes as
+     * `prop?: string` rather than `prop?: string | undefined`, so under this
+     * flag every conditional attribute — `role={maybeUndefined}`, the standard
+     * way to omit one — is a type error. The flag is catching the library's
+     * type declarations, not our code.
+     *
+     * The alternative is a non-null assertion or a cast at every conditional
+     * attribute in every component, which trades one real check for dozens of
+     * silenced ones. Scoping the flag off here is the smaller loss, and it is
+     * still enforced across @meridian/react and the token pipeline.
+     */
+    "exactOptionalPropertyTypes": false
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist", "**/*.spec.tsx", "**/*.e2e.ts"]

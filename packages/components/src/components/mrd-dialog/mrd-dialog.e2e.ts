@@ -26,7 +26,7 @@ describe('mrd-dialog (e2e)', () => {
     await new Promise(r => setTimeout(r, 50));
 
     const focused = await p.evaluate(() => {
-      let el = document.activeElement as Element | null;
+      let el = document.activeElement;
       while (el?.shadowRoot?.activeElement) el = el.shadowRoot.activeElement;
       return el?.getAttribute('data-dialog-heading') !== null ? 'heading' : el?.className;
     });
@@ -80,9 +80,9 @@ describe('mrd-dialog (e2e)', () => {
     for (let i = 0; i < 8; i++) await p.keyboard.press('Tab');
 
     const inside = await p.evaluate(() => {
-      let el = document.activeElement as Element | null;
+      let el = document.activeElement;
       while (el?.shadowRoot?.activeElement) el = el.shadowRoot.activeElement;
-      return Boolean(el?.closest('mrd-dialog')) || Boolean(el?.getRootNode() instanceof ShadowRoot);
+      return Boolean(el?.closest('mrd-dialog')) || el?.getRootNode() instanceof ShadowRoot;
     });
     expect(inside).toBe(true);
   });

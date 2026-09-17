@@ -187,7 +187,7 @@ export const EscapeIsIgnoredWhenPersistent: Story = {
     await userEvent.keyboard('{Escape}');
     await new Promise(r => setTimeout(r, 100));
 
-    expect(dialog.open).toBe(true);
+    await expect(dialog.open).toBe(true);
     await (dialog as any).hide();
   },
 };

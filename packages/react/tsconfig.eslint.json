@@ -1,0 +1,8 @@
+{
+  // The build tsconfig excludes tests because they are not shipped. Lint should
+  // still see them — a test is code, and the rules that catch a floating promise
+  // catch it in a test too.
+  "extends": "./tsconfig.json",
+  "include": ["src", "vitest.config.ts"],
+  "exclude": ["node_modules", "dist"]
+}

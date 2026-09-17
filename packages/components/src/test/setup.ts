@@ -10,38 +10,48 @@
 
 /* ---------------------------------------------------------------- <dialog> */
 
+type DialogShim = {
+  open: boolean;
+  returnValue: string;
+  showModal(): void;
+  show(): void;
+  close(returnValue?: string): void;
+};
+
 if (typeof HTMLDialogElement === 'undefined' || !HTMLDialogElement.prototype.showModal) {
   const openFlag = new WeakMap<HTMLElement, boolean>();
+  const proto = HTMLElement.prototype as unknown as DialogShim & HTMLElement;
 
-  Object.defineProperty(HTMLElement.prototype, 'open', {
+  Object.defineProperty(proto, 'open', {
     configurable: true,
     get(this: HTMLElement) {
       return openFlag.get(this) ?? this.hasAttribute('open');
     },
     set(this: HTMLElement, value: boolean) {
-      openFlag.set(this, Boolean(value));
+      openFlag.set(this, value);
       if (value) this.setAttribute('open', '');
       else this.removeAttribute('open');
     },
   });
 
-  HTMLElement.prototype.showModal = function showModal(this: HTMLElement) {
-    openFlag.set(this, true);
-    this.setAttribute('open', '');
-    // The real implementation makes the dialog the top layer; the only part
-    // our tests care about is that `open` flips and `close` fires an event.
-  };
-
-  HTMLElement.prototype.show = function show(this: HTMLElement) {
+  // The real implementation also moves the dialog to the top layer and makes
+  // the rest of the document inert. Neither is observable from a unit test;
+  // what the tests assert is that `open` flips and `close` fires its event.
+  proto.showModal = function showModal(this: HTMLElement) {
     openFlag.set(this, true);
     this.setAttribute('open', '');
   };
 
-  HTMLElement.prototype.close = function close(this: HTMLElement, returnValue?: string) {
+  proto.show = function show(this: HTMLElement) {
+    openFlag.set(this, true);
+    this.setAttribute('open', '');
+  };
+
+  proto.close = function close(this: HTMLElement, returnValue?: string) {
     if (!openFlag.get(this) && !this.hasAttribute('open')) return;
     openFlag.set(this, false);
     this.removeAttribute('open');
-    if (returnValue !== undefined) (this as HTMLDialogElement).returnValue = returnValue;
+    if (returnValue !== undefined) (this as unknown as DialogShim).returnValue = returnValue;
     this.dispatchEvent(new Event('close'));
   };
 }
@@ -49,7 +59,7 @@ if (typeof HTMLDialogElement === 'undefined' || !HTMLDialogElement.prototype.sho
 /* -------------------------------------------------------------- matchMedia */
 
 if (!window.matchMedia) {
-  window.matchMedia = ((query: string) => ({
+  window.matchMedia = (query: string) => ({
     matches: false,
     media: query,
     onchange: null,
@@ -58,7 +68,7 @@ if (!window.matchMedia) {
     addEventListener: () => undefined,
     removeEventListener: () => undefined,
     dispatchEvent: () => false,
-  })) as typeof window.matchMedia;
+  });
 }
 
 /* -------------------------------------------- ResizeObserver / scrollTo etc */

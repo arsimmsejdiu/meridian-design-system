@@ -12,7 +12,7 @@ const config: TestRunnerConfig = {
   async preVisit(page) {
     await injectAxe(page);
   },
-  async postVisit(page, context) {
+  async postVisit(page) {
     await configureAxe(page, {
       rules: [{ id: 'region', enabled: false }],
     });

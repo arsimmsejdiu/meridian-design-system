@@ -22,7 +22,7 @@ export function lockScroll(): void {
   const gap = scrollbarWidth();
   if (gap > 0) {
     const current = parseFloat(getComputedStyle(body).paddingRight) || 0;
-    body.style.paddingRight = `${current + gap}px`;
+    body.style.paddingRight = `${String(current + gap)}px`;
   }
   body.style.overflow = 'hidden';
 }
