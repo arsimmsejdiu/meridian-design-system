@@ -8,7 +8,6 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 permissions:
   contents: write
   pull-requests: write
-  id-token: write
 
 jobs:
   release:
@@ -21,23 +20,26 @@ jobs:
         with: { version: '9.12.0' }
       - uses: actions/setup-node@v5
         with:
-          node-version: '20.18.0'
+          node-version: '22.11.0'
           cache: pnpm
           registry-url: 'https://registry.npmjs.org'
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
 
-      # Changesets opens a "Version Packages" PR; merging it publishes.
-      # Every change to a published package needs a changeset, so the
-      # changelog is written by whoever made the change, not reconstructed
-      # from commit messages afterwards.
+      # Changesets collects the pending changesets, bumps versions, writes the
+      # changelogs and opens a "Version Packages" PR. Every change to a published
+      # package needs a changeset, so the changelog is written by whoever made
+      # the change rather than reconstructed from commit messages afterwards.
+      #
+      # `publish:` is deliberately not set. These packages are not on npm, and
+      # wiring a publish step that fails on every run for want of a token teaches
+      # everyone to ignore a red Release badge — which is the badge you least
+      # want ignored. To start publishing: add an NPM_TOKEN secret and
+      # `publish: pnpm release` below.
       - uses: changesets/action@v1
         with:
           version: pnpm version-packages
-          publish: pnpm release
           commit: 'chore: version packages'
           title: 'chore: version packages'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_CONFIG_PROVENANCE: true
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

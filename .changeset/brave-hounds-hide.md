@@ -8,7 +8,7 @@ Two bugs, one cause — and the second only appeared once the first was fixed.
 
 `getFocusableElements` descended into shadow roots but never followed `<slot>`
 elements. `mrd-dialog` renders `<slot name="footer">` inside its shadow root,
-so every button a consumer passes is a child of the *host*, in the light DOM.
+so every button a consumer passes is a child of the _host_, in the light DOM.
 The walk never reached them. It now follows slots via `assignedElements()` and
 returns nodes in composed-tree order, which is the order a user tabs through.
 
