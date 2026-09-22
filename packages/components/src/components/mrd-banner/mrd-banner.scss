@@ -92,3 +92,17 @@
   @include focus-ring;
   @include min-target;
 }
+
+/*
+ * Slotted list content — the error-summary pattern.
+ *
+ * `::slotted()` reaches the slotted element itself and nothing below it, so
+ * this can set the list's own spacing but cannot touch the links inside. Target
+ * size for those (WCAG 2.2 SC 2.5.8) is handled where the markup is authored:
+ * `MeridianForm` in @meridian/react, and the story for the plain-HTML case.
+ */
+::slotted(ul),
+::slotted(ol) {
+  margin: var(--mrd-space-100) 0 0;
+  padding-inline-start: var(--mrd-space-200);
+}

@@ -103,7 +103,36 @@ export function MeridianForm<T extends FieldValues>({
     if (!showSummary) return;
     if (focusedForSubmit.current === submitCount) return;
     focusedForSubmit.current = submitCount;
-    summaryRef.current?.focus();
+
+    /*
+     * Focus after a frame, not in the effect body.
+     *
+     * The summary is a custom element. React has created it and set its
+     * attributes by the time this effect runs, but the element has not
+     * necessarily finished its own first render — and `focus()` on an element
+     * the browser does not yet consider focusable is silently dropped. Nothing
+     * throws; the summary simply appears and announces nothing, which is the
+     * exact failure the summary exists to prevent.
+     *
+     * One frame is enough in practice, and the second attempt covers a slow
+     * upgrade without looping.
+     */
+    let secondAttempt = 0;
+    const first = requestAnimationFrame(() => {
+      const el = summaryRef.current;
+      el?.focus();
+
+      if (el && document.activeElement !== el) {
+        secondAttempt = requestAnimationFrame(() => {
+          el.focus();
+        });
+      }
+    });
+
+    return () => {
+      cancelAnimationFrame(first);
+      if (secondAttempt) cancelAnimationFrame(secondAttempt);
+    };
   }, [showSummary, submitCount]);
 
   return (
@@ -128,11 +157,26 @@ export function MeridianForm<T extends FieldValues>({
             tabIndex={-1}
             ref={summaryRef}
           >
-            <ul>
+            <ul style={{ margin: 0, paddingInlineStart: 'var(--mrd-space-200, 1rem)' }}>
               {entries.map(([name, message]) => (
                 <li key={name}>
                   <a
                     href={`#${name}`}
+                    /*
+                     * A block with vertical padding, so the whole row is the
+                     * target. axe flags these links under WCAG 2.2 SC 2.5.8
+                     * otherwise: links in running prose are exempt from the
+                     * 24x24 minimum, but these are the primary controls of the
+                     * summary, not prose.
+                     *
+                     * Inline because this package ships no stylesheet, and a
+                     * design system that requires a second import to be
+                     * accessible will be used without it.
+                     */
+                    style={{
+                      display: 'inline-block',
+                      padding: 'var(--mrd-space-50, 0.25rem) 0',
+                    }}
                     onClick={event => {
                       event.preventDefault();
                       // setFocus goes through our field ref, which calls the

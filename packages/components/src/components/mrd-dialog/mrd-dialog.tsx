@@ -88,6 +88,7 @@ export class MrdDialog {
   }
 
   disconnectedCallback() {
+    document.removeEventListener('keydown', this.handleEscapeKey, true);
     this.trap?.deactivate();
     unlockScroll();
   }
@@ -143,6 +144,7 @@ export class MrdDialog {
      */
     this.trap = new FocusTrap(dialog, this.host);
     this.trap.activate();
+    document.addEventListener('keydown', this.handleEscapeKey, true);
 
     lockScroll();
     requestAnimationFrame(() => this.moveInitialFocus(dialog));
@@ -157,6 +159,7 @@ export class MrdDialog {
   }
 
   private deactivate(reason: DialogCloseReason) {
+    document.removeEventListener('keydown', this.handleEscapeKey, true);
     this.trap?.deactivate();
     this.trap = undefined;
     unlockScroll();
@@ -175,10 +178,31 @@ export class MrdDialog {
   /** Native `cancel` fires for Escape; we intercept it to honour `persistent`. */
   private handleCancel = (event: Event) => {
     event.preventDefault();
-    if (this.persistent) return;
+    this.dismissByEscape();
+  };
+
+  /**
+   * Escape, for the cases the platform does not cover.
+   *
+   * The native `cancel` event only fires for a dialog in the top layer. On the
+   * fallback path — no `showModal`, `open` set by hand — nothing fires it, so
+   * without this listener Escape silently does nothing on exactly the browsers
+   * least able to cope with a modal they cannot dismiss.
+   *
+   * Both routes converge on `dismissByEscape`, which is idempotent, so the
+   * modal case closing twice is harmless.
+   */
+  private handleEscapeKey = (event: KeyboardEvent) => {
+    if (event.key !== 'Escape') return;
+    if (!this.open) return;
+    this.dismissByEscape();
+  };
+
+  private dismissByEscape() {
+    if (this.persistent || !this.open) return;
     this.open = false;
     this.deactivate('escape');
-  };
+  }
 
   /**
    * A click on `<dialog>` itself is a backdrop click — the panel inside stops

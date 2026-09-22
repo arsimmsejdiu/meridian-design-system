@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
-import { expect, userEvent, within, waitFor } from '@storybook/test';
+import { expect, userEvent, waitFor } from '@storybook/test';
 import { createElement, useState, StrictMode } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { useFormContext, useFieldArray, type Control } from 'react-hook-form';
@@ -333,10 +333,27 @@ export const SummaryAppearsAndFocuses: Story = {
       </MeridianForm>,
     ),
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
+    // React mounts in a microtask, so the submit button is not there yet.
+    const submit = await waitFor(() => {
+      const el = canvasElement.querySelector('mrd-button[type="submit"]');
+      if (!el?.shadowRoot) throw new Error('Submit button has not rendered yet.');
+      return el;
+    });
 
-    await waitFor(() => expect(canvas.getByText('Create account')).toBeInTheDocument());
-    await userEvent.click(canvas.getByText('Create account'));
+    /*
+     * Submitted from the keyboard rather than with a synthetic click.
+     *
+     * `userEvent.click` dispatches pointerdown → focus → click, and its focus
+     * step lands *after* the frame on which the error summary takes focus — so
+     * the assertion below would read the button, not the summary, for reasons
+     * that have nothing to do with the behaviour under test. Pressing Enter on
+     * the focused control submits the same form without that interference, and
+     * is how a keyboard user gets here anyway.
+     */
+    const control = submit.shadowRoot?.querySelector('button');
+    if (!control) throw new Error('Submit button has no control in its shadow root.');
+    control.focus();
+    await userEvent.keyboard('{Enter}');
 
     const summary = await waitFor(() => {
       const el = canvasElement.querySelector<HTMLElement>('mrd-banner[tone="danger"]');

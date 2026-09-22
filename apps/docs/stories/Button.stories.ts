@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
-import { expect, userEvent, within, fn } from '@storybook/test';
+import { expect, userEvent, fn } from '@storybook/test';
+import { clickButton } from './test-helpers';
 
 const meta: Meta = {
   title: 'Components/Button',
@@ -139,13 +140,14 @@ export const ActivatesOnce: Story = {
   args: { onMrdClick: fn() },
   render: args => html`<mrd-button @mrdClick=${args.onMrdClick}>Confirm</mrd-button>`,
   play: async ({ canvasElement, args }) => {
-    const canvas = within(canvasElement);
-    const button = canvas.getByText('Confirm');
+    const host = canvasElement.querySelector('mrd-button');
 
-    await userEvent.click(button);
+    await clickButton(host);
     await expect(args.onMrdClick).toHaveBeenCalledTimes(1);
 
-    await userEvent.tab();
+    // And from the keyboard, which is the half that usually goes untested.
+    // The click left focus on the control, so Enter goes to the right place —
+    // tabbing first would move focus off it and test nothing.
     await userEvent.keyboard('{Enter}');
     await expect(args.onMrdClick).toHaveBeenCalledTimes(2);
   },
@@ -155,7 +157,7 @@ export const DoesNotActivateWhenLoading: Story = {
   args: { onMrdClick: fn() },
   render: args => html`<mrd-button loading @mrdClick=${args.onMrdClick}>Saving</mrd-button>`,
   play: async ({ canvasElement, args }) => {
-    await userEvent.click(within(canvasElement).getByText('Saving'));
+    await clickButton(canvasElement.querySelector('mrd-button'));
     await expect(args.onMrdClick).not.toHaveBeenCalled();
   },
 };

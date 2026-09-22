@@ -134,12 +134,39 @@ export const Live: Story = {
 
 export const AsErrorSummary: Story = {
   render: () => html`
-    <mrd-banner tone="danger" heading="There is a problem" live>
-      <ul style="margin:0; padding-left:1.25rem;">
-        <li><a href="#email">Enter an email address</a></li>
-        <li><a href="#name">Enter your name</a></li>
-      </ul>
-    </mrd-banner>
+    <form
+      style="display:grid; gap:1rem; max-width:24rem;"
+      @submit=${(e: Event) => e.preventDefault()}
+    >
+      <mrd-banner tone="danger" heading="There is a problem" live>
+        <ul style="margin:0; padding-left:1.25rem; line-height:1.9;">
+          <li>
+            <a href="#summary-email" style="display:inline-block; padding:0.25rem 0;"
+              >Enter an email address</a
+            >
+          </li>
+          <li>
+            <a href="#summary-name" style="display:inline-block; padding:0.25rem 0;"
+              >Enter your name</a
+            >
+          </li>
+        </ul>
+      </mrd-banner>
+
+      <!--
+        The fields are part of the story, not decoration. A summary whose links
+        point at nothing is not the pattern — it is the shape of the pattern, and
+        axe says so: an in-page link with no target is a real failure for anyone
+        who follows it.
+      -->
+      <mrd-text-field
+        id="summary-email"
+        label="Email address"
+        type="email"
+        error="Enter an email address"
+      ></mrd-text-field>
+      <mrd-text-field id="summary-name" label="Full name" error="Enter your name"></mrd-text-field>
+    </form>
   `,
   parameters: {
     docs: {

@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
 import { expect, userEvent, waitFor } from '@storybook/test';
+import { clickButton } from './test-helpers';
 
 const meta: Meta = {
   title: 'Components/Dialog',
@@ -160,7 +161,7 @@ export const ReturnsFocusOnClose: Story = {
     const opener = canvasElement.querySelector('#opener')!;
     const dialog = document.getElementById('dlg-focus') as HTMLElement & { open: boolean };
 
-    await userEvent.click(opener);
+    await clickButton(opener);
     await waitFor(() => expect(dialog.open).toBe(true));
     await waitFor(() => expect(dialog.contains(document.activeElement)).toBe(true));
 
@@ -181,7 +182,7 @@ export const EscapeIsIgnoredWhenPersistent: Story = {
   play: async ({ canvasElement }) => {
     const dialog = document.getElementById('dlg-persist-test') as HTMLElement & { open: boolean };
 
-    await userEvent.click(canvasElement.querySelector('#opener-p')!);
+    await clickButton(canvasElement.querySelector('#opener-p'));
     await waitFor(() => expect(dialog.open).toBe(true));
 
     await userEvent.keyboard('{Escape}');
