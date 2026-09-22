@@ -1,6 +1,6 @@
 {
   "name": "@meridian/components",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Framework-agnostic Web Components built with Stencil.",
   "license": "Apache-2.0",
   "main": "dist/index.cjs.js",
