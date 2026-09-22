@@ -54,3 +54,15 @@ from someone who has tested the change with a screen reader — not the author.
 
 [Conventional Commits](https://www.conventionalcommits.org/). The type drives
 nothing automatically; changesets do the versioning. It keeps history readable.
+
+## Changesets and the root package
+
+A changeset names the **published packages** a change affects —
+`@meridian/tokens`, `@meridian/components`, `@meridian/react`,
+`@meridian/angular`. Never the root `meridian-design-system`: it is
+`private: true`, so changesets cannot version it, and `changeset version` fails
+outright with _"Found changeset … for package … which is not in the workspace"_.
+
+Changes to CI, lint config, the example app or the docs site do not need a
+changeset at all. Nothing a consumer installs has changed, so there is nothing
+to put in a changelog. Describe those in the commit message and move on.
