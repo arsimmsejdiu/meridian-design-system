@@ -77,6 +77,17 @@ jobs:
       - uses: actions/setup-node@v5
         with: { node-version: '${{ env.NODE_VERSION }}', cache: pnpm }
       - run: pnpm install --frozen-lockfile
+
+      # Puppeteer downloads its browser in a postinstall script, into
+      # ~/.cache/puppeteer — outside the pnpm store. setup-node caches the store,
+      # so on a cache hit the postinstall does not re-run and the browser is
+      # never fetched. The e2e suite then fails with "Browser was not found at
+      # the configured executablePath", which reads like a broken test rather
+      # than a missing download. Installing it explicitly is cheap and removes
+      # the dependency on whether the cache happened to hit.
+      - name: Install the browser the e2e runner needs
+        run: pnpm --filter @meridian/components exec puppeteer browsers install chrome-headless-shell
+
       - run: pnpm build
       - run: pnpm --filter @meridian/components test:e2e
 
