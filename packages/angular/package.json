@@ -1,6 +1,6 @@
 {
   "name": "@meridian/angular",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Angular bindings for Meridian \u2014 generated from the component source.",
   "license": "Apache-2.0",
   "main": "dist/index.js",

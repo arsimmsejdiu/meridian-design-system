@@ -1,6 +1,6 @@
 {
   "name": "@meridian/tokens",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Design tokens — single source of truth for colour, type, space, motion and elevation.",
   "license": "Apache-2.0",
   "type": "module",
