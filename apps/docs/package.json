@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "storybook dev -p 6006 --no-open --disable-telemetry",
     "build": "storybook build -o storybook-static --disable-telemetry",
-    "test:a11y": "test-storybook --maxWorkers=2 --test-timeout 30000",
+    "test:a11y": "test-storybook --maxWorkers=2 --testTimeout 30000",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
